@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import TurkeyMap from './components/TurkeyMap'
 import GuessInput from './components/GuessInput'
+import StatsModal from './components/StatsModal'
 import { findProvince, MAX_BORDER_KM } from './lib/provinces'
 import {
   dailyProvince,
@@ -10,6 +11,7 @@ import {
   proximity,
   heatColor,
 } from './lib/game'
+import { loadStats, recordDailyWin } from './lib/stats'
 
 const DAILY_STORE = (key) => `iller-globle:daily:${key}`
 
@@ -28,6 +30,10 @@ export default function App() {
   // Görünüm ayarı: sıralama (tahmin sırası mı, yakınlık mı)
   const [byGuessOrder, setByGuessOrder] = useState(false)
 
+  // İstatistik popup'ı
+  const [stats, setStats] = useState(() => loadStats())
+  const [showStats, setShowStats] = useState(false)
+
   // Günün ili ilerlemesini yükle
   useEffect(() => {
     if (mode !== 'daily') return
@@ -39,6 +45,7 @@ export default function App() {
         setGuesses(gs)
         setWon(!!data.won)
         setGaveUp(!!data.gaveUp)
+        if (data.won) setStats(recordDailyWin(dateKey, gs.length))
         return
       }
     } catch {}
@@ -69,10 +76,14 @@ export default function App() {
       const next = [...guesses, province]
       setGuesses(next)
       const isWin = province.name === target.name
-      if (isWin) setWon(true)
       if (mode === 'daily') persistDaily(next, isWin, false)
+      if (isWin) {
+        setWon(true)
+        if (mode === 'daily') setStats(recordDailyWin(dateKey, next.length))
+        setShowStats(true)
+      }
     },
-    [finished, guesses, target, mode, persistDaily]
+    [finished, guesses, target, mode, persistDaily, dateKey]
   )
 
   const evaluations = useMemo(
@@ -114,21 +125,30 @@ export default function App() {
     setGuesses([])
     setWon(false)
     setGaveUp(false)
+    setShowStats(false)
   }
 
   function giveUp() {
     setGaveUp(true)
     if (mode === 'daily') persistDaily(guesses, false, true)
+    setShowStats(true)
   }
 
   function switchMode(m) {
     setMode(m)
+    setShowStats(false)
     if (m === 'practice') {
       setGuesses([])
       setWon(false)
       setGaveUp(false)
       setPracticeTarget(randomProvince())
     }
+  }
+
+  function onModalPrimary() {
+    if (mode === 'daily') switchMode('practice')
+    else newPractice()
+    setShowStats(false)
   }
 
   const [copied, setCopied] = useState(false)
@@ -176,21 +196,22 @@ export default function App() {
         <GuessInput onGuess={handleGuess} disabled={finished} guessedNames={guessedNames} />
       )}
 
-      {finished && (
-        <div className={'result ' + (won ? 'win' : 'lose')}>
-          {won ? (
-            <p>
-              <b>{target.name}</b>! {guesses.length} tahminde buldun.
-            </p>
-          ) : (
-            <p>
-              Doğru cevap: <b>{target.name}</b> (plaka {target.plate}).
-            </p>
-          )}
-          <div className="result-actions">
-            <button onClick={share}>{copied ? 'Kopyalandı' : 'Sonucu paylaş'}</button>
-            {mode === 'practice' && <button onClick={newPractice}>Yeni oyun</button>}
-          </div>
+      {finished && !showStats && (
+        <div className="finished-bar">
+          <span>
+            {won ? (
+              <>
+                <b>{target.name}</b> — {guesses.length} tahmin
+              </>
+            ) : (
+              <>
+                Cevap: <b>{target.name}</b>
+              </>
+            )}
+          </span>
+          <button className="linkbtn" onClick={() => setShowStats(true)}>
+            İstatistikler
+          </button>
         </div>
       )}
 
@@ -222,6 +243,20 @@ export default function App() {
             )}
           </div>
         </section>
+      )}
+
+      {showStats && finished && (
+        <StatsModal
+          stats={stats}
+          guessCount={guesses.length}
+          won={won}
+          answer={target.name}
+          mode={mode}
+          onClose={() => setShowStats(false)}
+          onPrimary={onModalPrimary}
+          onShare={share}
+          shareLabel={copied ? 'Kopyalandı' : 'Paylaş'}
+        />
       )}
     </div>
   )

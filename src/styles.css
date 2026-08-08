@@ -1,0 +1,344 @@
+:root {
+  --bg: #0b1120;
+  --bg-soft: #111a2e;
+  --panel: #16213a;
+  --text: #e6edf7;
+  --muted: #94a3b8;
+  --accent: #e30a17;
+  --accent-2: #22c55e;
+  --border: #24314f;
+  --map-empty: #1e293b;
+  --map-stroke: #0b1120;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: radial-gradient(1200px 600px at 50% -10%, #16233f 0%, var(--bg) 60%);
+  color: var(--text);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.9rem;
+  letter-spacing: -0.02em;
+}
+
+.flag {
+  font-size: 1.6rem;
+}
+
+.tagline {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.modes {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 12px 0 16px;
+}
+
+.modes button {
+  flex: 1;
+  max-width: 220px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.modes button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.map-wrap {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 8px;
+  margin-bottom: 14px;
+}
+
+.tr-map {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.province {
+  stroke: var(--map-stroke);
+  stroke-width: 0.5;
+  transition: fill 0.25s ease;
+}
+
+.province.guessed {
+  stroke: #0b1120;
+  stroke-width: 0.6;
+}
+
+.province.target {
+  stroke: #052e16;
+  stroke-width: 1;
+}
+
+/* Tahmin kutusu */
+.guess-box {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.guess-row {
+  display: flex;
+  gap: 8px;
+}
+
+.guess-row input {
+  flex: 1;
+  padding: 13px 14px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  outline: none;
+}
+
+.guess-row input:focus {
+  border-color: var(--accent);
+}
+
+.guess-btn {
+  padding: 0 18px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.guess-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.suggestions {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+.suggestions li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.suggestions li.active {
+  background: var(--bg-soft);
+}
+
+.suggestions li.used {
+  opacity: 0.45;
+}
+
+.suggestions .plate {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Durum / sonuç */
+.status {
+  text-align: center;
+  color: var(--muted);
+  margin: 4px 0 10px;
+  font-size: 0.95rem;
+}
+
+.status b {
+  color: var(--text);
+}
+
+.result {
+  text-align: center;
+  padding: 14px;
+  border-radius: 12px;
+  margin: 8px 0 14px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.result.win {
+  border-color: #14532d;
+  background: #0f2a1b;
+}
+
+.result.lose {
+  border-color: #3f1d2b;
+  background: #241019;
+}
+
+.result p {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+
+.result-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.result-actions button,
+.toolbar .giveup {
+  padding: 9px 16px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.result-actions button:first-child {
+  background: var(--accent-2);
+  border-color: var(--accent-2);
+  color: #06210f;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 4px 0 8px;
+}
+
+.toolbar .count {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Tahmin listesi */
+.guess-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.guess-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+.guess-list li.hit {
+  border-color: var(--accent-2);
+  background: #0f2a1b;
+}
+
+.swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  flex: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.pname {
+  flex: 1;
+  font-weight: 600;
+}
+
+.dist {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9rem;
+}
+
+.prox {
+  width: 46px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.arrow {
+  display: inline-block;
+  font-weight: 800;
+  color: var(--text);
+  transition: transform 0.2s ease;
+  width: 16px;
+  text-align: center;
+}
+
+.footer {
+  margin-top: 22px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 1.6rem;
+  }
+  .prox {
+    display: none;
+  }
+}

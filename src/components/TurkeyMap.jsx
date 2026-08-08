@@ -67,7 +67,7 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
   return (
     <div className="map-wrap">
       <svg
-        viewBox={`0 ${-DEPTH} ${WIDTH} ${HEIGHT + DEPTH + 14}`}
+        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         className="tr-map"
         role="img"
         aria-label="Türkiye uydu haritası"
@@ -81,16 +81,16 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
           </filter>
           {/* İllerin birleşim siluetinden Türkiye ulusal sınır bandı */}
           <filter id="tr-border" x="-5%" y="-5%" width="110%" height="110%">
-            <feMorphology in="SourceAlpha" operator="dilate" radius="1.6" result="dil" />
-            <feMorphology in="SourceAlpha" operator="erode" radius="0.9" result="ero" />
+            <feMorphology in="SourceAlpha" operator="dilate" radius="0.9" result="dil" />
+            <feMorphology in="SourceAlpha" operator="erode" radius="0.5" result="ero" />
             <feComposite in="dil" in2="ero" operator="out" result="ring" />
             <feFlood floodColor="#0b0b0b" result="col" />
             <feComposite in="col" in2="ring" operator="in" />
           </filter>
         </defs>
 
-        {/* Deniz zemini (üst/alt marjları da kaplasın) */}
-        <rect x="0" y={-DEPTH} width={WIDTH} height={HEIGHT + DEPTH + 14} fill="#2f6fb2" />
+        {/* Deniz zemini */}
+        <rect x="0" y="0" width={WIDTH} height={HEIGHT} fill="#2f6fb2" />
 
         {/* Kabartma zemin karaya kırpılı: Türkiye + komşu kara; deniz mavi kalır */}
         <image

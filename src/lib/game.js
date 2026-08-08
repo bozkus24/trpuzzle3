@@ -53,17 +53,18 @@ export const TARGET_COLOR = '#166534'
 
 /**
  * Yakınlığa göre "sıcaklık" rengi. Mavi yok.
- * Uzak = beyaza yakın, yaklaştıkça = kırmızı, isabet = koyu yeşil.
+ * Uzak = açık krem, yaklaştıkça krem -> turuncu -> kırmızı -> koyu bordo.
+ * En uzak seviye kremden daha açık; en yakın (0 km) koyu bordo. İsabet = koyu yeşil.
  */
 export function heatColor(prox, isTarget = false) {
   if (isTarget) return TARGET_COLOR // doğru il — koyu yeşil
-  // 0 -> beyaza yakın, 1'e yakın -> kırmızı
+  // 0 (en uzak) -> soluk krem ... 1 (en yakın) -> koyu bordo
   const stops = [
-    [0.0, [242, 240, 238]], // çok uzak — kirli beyaz
-    [0.3, [246, 202, 190]], // uzak — açık pembe
-    [0.55, [235, 145, 115]],// ılık — somon
-    [0.75, [219, 84, 62]],  // sıcak — kiremit kırmızısı
-    [1.0, [190, 20, 20]],   // çok sıcak — kırmızı
+    [0.0, [250, 240, 222]], // en uzak — soluk krem (kremden açık)
+    [0.2, [240, 216, 168]], // uzak — krem (Fransa)
+    [0.45, [224, 138, 84]], // ılık — turuncu (Nepal)
+    [0.7, [196, 78, 58]],   // sıcak — kırmızı (Moğolistan)
+    [1.0, [108, 18, 18]],   // en yakın — koyu bordo (G. Kore)
   ]
   let lo = stops[0]
   let hi = stops[stops.length - 1]

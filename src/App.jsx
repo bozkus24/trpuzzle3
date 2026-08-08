@@ -117,8 +117,8 @@ export default function App() {
     [evals]
   )
   const display = byGuessOrder ? evals : byDist
-  // Bilgi satırı yalnızca SON yazılan ile göre yorum yapar
-  const last = evals.length ? evals[evals.length - 1] : null
+  // Bilgi satırı EN YAKIN (minimum sınır mesafesi) ile göre
+  const closest = byDist.length ? byDist[0] : null
 
   function newPractice() {
     setPracticeTarget(randomProvince(practiceTarget))
@@ -201,7 +201,7 @@ export default function App() {
           <span>
             {won ? (
               <>
-                <b>{target.name}</b> — {guesses.length} tahmin
+                <b>{target.name}</b> - {guesses.length} tahmin
               </>
             ) : (
               <>
@@ -229,7 +229,7 @@ export default function App() {
 
           <div className="controls">
             <span className="metric">
-              En yakın sınır: <b>{last ? `${last.dist} km` : '—'}</b>
+              En yakın sınır: <b>{closest ? `${closest.dist} km` : '-'}</b>
             </span>
 
             <button className="linkbtn" onClick={() => setByGuessOrder((v) => !v)}>

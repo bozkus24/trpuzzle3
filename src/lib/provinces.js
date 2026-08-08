@@ -114,73 +114,93 @@ export const MAX_DISTANCE_KM = 1650
  *  Komşu (sınırdaş) illerde ~0 km çıkar.
  * ------------------------------------------------------------------ */
 
-// Türkiye için yerel düzlem yaklaşımı (küçük ölçekte yeterince doğru)
-const LAT_REF = 39
-const KX = 111.32 * Math.cos((LAT_REF * Math.PI) / 180) // km / derece boylam
-const KY = 110.574 // km / derece enlem
+// Küre yarıçapı (km)
+const R_EARTH = 6371
+
+// lon/lat -> küre üzerinde 3B kartezyen (km). Enlem çarpıtması yok.
+function toXYZ(lon, lat) {
+  const phi = (lat * Math.PI) / 180
+  const lam = (lon * Math.PI) / 180
+  const cphi = Math.cos(phi)
+  return [
+    R_EARTH * cphi * Math.cos(lam),
+    R_EARTH * cphi * Math.sin(lam),
+    R_EARTH * Math.sin(phi),
+  ]
+}
 
 // Polygon / MultiPolygon fark etmeksizin poligon listesine normalize et
 function polygonsOf(geometry) {
   return geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates
 }
 
-// Her il için sınır halkalarını düzlem km koordinatına çevir (bir kez)
-function buildPlanar(feature) {
+// Her il için sınır halkalarını 3B kartezyen noktalara çevir (bir kez)
+function build3D(feature) {
   const rings = []
   for (const poly of polygonsOf(feature.geometry)) {
     for (const ring of poly) {
-      const pts = ring.map(([lon, lat]) => [lon * KX, lat * KY])
+      const pts = ring.map(([lon, lat]) => toXYZ(lon, lat))
       if (pts.length >= 2) rings.push(pts)
     }
   }
   return rings
 }
-for (const p of provinces) p._planar = buildPlanar(p.feature)
+for (const p of provinces) p._xyz = build3D(p.feature)
 
-// Nokta -> doğru parçası mesafesi (düzlem)
-function pointSeg(px, py, ax, ay, bx, by) {
-  const dx = bx - ax
-  const dy = by - ay
-  const len2 = dx * dx + dy * dy
-  let t = len2 ? ((px - ax) * dx + (py - ay) * dy) / len2 : 0
+// 3B nokta -> doğru parçası (kiriş) mesafesi
+function pointSeg3(p, a, b) {
+  const abx = b[0] - a[0]
+  const aby = b[1] - a[1]
+  const abz = b[2] - a[2]
+  const apx = p[0] - a[0]
+  const apy = p[1] - a[1]
+  const apz = p[2] - a[2]
+  const len2 = abx * abx + aby * aby + abz * abz
+  let t = len2 ? (apx * abx + apy * aby + apz * abz) / len2 : 0
   t = t < 0 ? 0 : t > 1 ? 1 : t
-  const cx = ax + t * dx
-  const cy = ay + t * dy
-  return Math.hypot(px - cx, py - cy)
+  const dx = apx - t * abx
+  const dy = apy - t * aby
+  const dz = apz - t * abz
+  return Math.sqrt(dx * dx + dy * dy + dz * dz) // kiriş (km)
 }
 
-// Bir nokta kümesi ile bir halka kümesinin kenarları arası min mesafe
+// Bir nokta kümesi ile bir halka kümesinin kenarları arası min kiriş mesafesi
 function minPointsToRings(pts, rings, best) {
   for (let i = 0; i < pts.length; i++) {
-    const px = pts[i][0]
-    const py = pts[i][1]
+    const p = pts[i]
     for (const ring of rings) {
       for (let j = 0; j < ring.length - 1; j++) {
-        const a = ring[j]
-        const b = ring[j + 1]
-        const d = pointSeg(px, py, a[0], a[1], b[0], b[1])
+        const d = pointSeg3(p, ring[j], ring[j + 1])
         if (d < best) best = d
-        if (best === 0) return 0
       }
     }
   }
   return best
 }
 
+// Kiriş mesafesini büyük daire (kuş uçuşu) yay mesafesine çevir
+function chordToArc(chord) {
+  return 2 * R_EARTH * Math.asin(Math.min(1, chord / (2 * R_EARTH)))
+}
+
 const _borderCache = new Map()
 
-/** İki ilin sınırları arası en kısa mesafe (km). Komşuysa ~0. */
+/**
+ * İki ilin sınırları arası en kısa KUŞ UÇUŞU (büyük daire) mesafesi, km.
+ * Poligonların tüm kenarları arası gerçek minimum (nokta-kenar). Komşuysa ~0.
+ */
 export function borderDistanceKm(a, b) {
   if (a.name === b.name) return 0
   const ck = a.name < b.name ? a.name + '|' + b.name : b.name + '|' + a.name
   const hit = _borderCache.get(ck)
   if (hit !== undefined) return hit
-  const ptsA = a._planar.flat()
-  const ptsB = b._planar.flat()
-  let best = minPointsToRings(ptsA, b._planar, Infinity)
-  best = minPointsToRings(ptsB, a._planar, best)
-  _borderCache.set(ck, best)
-  return best
+  const ptsA = a._xyz.flat()
+  const ptsB = b._xyz.flat()
+  let best = minPointsToRings(ptsA, b._xyz, Infinity)
+  best = minPointsToRings(ptsB, a._xyz, best)
+  const arc = chordToArc(best)
+  _borderCache.set(ck, arc)
+  return arc
 }
 
 // Sınırdaş sayılma eşiği (km) — ortak sınır koordinatları çakıştığından ~0 çıkar
@@ -192,5 +212,5 @@ export function areNeighbors(a, b) {
   return borderDistanceKm(a, b) <= NEIGHBOR_EPS_KM
 }
 
-// En uzak iki ilin sınır mesafesi (Edirne <-> Hakkari ~1481km) — palet kalibrasyonu
-export const MAX_BORDER_KM = 1481
+// En uzak iki ilin kuş uçuşu sınır mesafesi (Edirne <-> Hakkari ~1470km) — palet kalibrasyonu
+export const MAX_BORDER_KM = 1470

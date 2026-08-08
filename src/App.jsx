@@ -11,19 +11,6 @@ import {
 
 const DAILY_STORE = (key) => `iller-globle:daily:${key}`
 
-// Tahminden hedefe yön açısı (0 = kuzey), pusula oku için
-function bearing(from, to) {
-  const toRad = (d) => (d * Math.PI) / 180
-  const toDeg = (r) => (r * 180) / Math.PI
-  const φ1 = toRad(from.lat)
-  const φ2 = toRad(to.lat)
-  const Δλ = toRad(to.lon - from.lon)
-  const y = Math.sin(Δλ) * Math.cos(φ2)
-  const x =
-    Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ)
-  return (toDeg(Math.atan2(y, x)) + 360) % 360
-}
-
 export default function App() {
   const [mode, setMode] = useState('daily') // 'daily' | 'practice'
   const dateKey = useMemo(() => todayKey(), [])
@@ -95,9 +82,12 @@ export default function App() {
     return m
   }, [evaluations])
 
-  // En yakından uzağa sıralı liste (sınır mesafesine göre)
+  // Yakınlığa göre sıralı: doğru il her zaman en üstte, sonra en yakın sınır
   const sorted = useMemo(
-    () => [...evaluations].sort((a, b) => a.borderKm - b.borderKm),
+    () =>
+      [...evaluations].sort(
+        (a, b) => (b.isTarget ? 1 : 0) - (a.isTarget ? 1 : 0) || a.borderKm - b.borderKm
+      ),
     [evaluations]
   )
 
@@ -181,13 +171,7 @@ export default function App() {
 
       {closest && !finished && (
         <div className="status">
-          En yakın sınır: <b>{closest.province.name}</b>
-          {closest.neighbor ? (
-            <span className="neigh"> — sınırdaş · 0 km</span>
-          ) : (
-            <> — {closest.borderKm} km</>
-          )}{' '}
-          <Arrow deg={bearing(closest.province, target)} hidden={closest.isTarget} />
+          En yakın sınır: <b>{closest.province.name}</b> — {closest.borderKm} km
         </div>
       )}
 
@@ -220,38 +204,13 @@ export default function App() {
 
       <ul className="guess-list">
         {sorted.map((e) => (
-          <li key={e.province.name} className={e.isTarget ? 'hit' : e.neighbor ? 'neighbor' : ''}>
+          <li key={e.province.name} className={e.isTarget ? 'hit' : ''}>
             <span className="swatch" style={{ background: e.color }} />
-            <span className="pname">
-              {e.province.name}
-              {e.neighbor && <span className="tag">sınırdaş</span>}
-            </span>
-            <span className="dist">
-              {e.isTarget ? 'Doğru!' : e.neighbor ? '0 km' : `${e.borderKm} km`}
-            </span>
-            {!e.isTarget && <Arrow deg={bearing(e.province, target)} />}
-            <span className="prox">{Math.round(e.proximity * 100)}%</span>
+            <span className="pname">{e.province.name}</span>
+            <span className="dist">{e.isTarget ? 'Doğru!' : `${e.borderKm} km`}</span>
           </li>
         ))}
       </ul>
-
-      <footer className="footer">
-        <span>Toplam 81 il · Türkçe karakter ve kısa adlar (Antep, Maraş, Urfa…) çalışır</span>
-      </footer>
     </div>
-  )
-}
-
-function Arrow({ deg, hidden }) {
-  if (hidden) return null
-  return (
-    <span
-      className="arrow"
-      style={{ transform: `rotate(${deg}deg)` }}
-      aria-label="hedef yönü"
-      title="Hedefin yönü"
-    >
-      ↑
-    </span>
   )
 }

@@ -1,16 +1,18 @@
 :root {
-  --bg: #0b1120;
-  --bg-soft: #111a2e;
-  --panel: #16213a;
-  --text: #e6edf7;
-  --muted: #94a3b8;
-  --accent: #e30a17;
-  --accent-2: #22c55e;
-  --border: #24314f;
-  --map-empty: #c2cdd6; /* land (boyanmamış iller) */
-  --map-sea: #94c2d6; /* mavi deniz (harita zemini) — land ile kontrast için daha doygun */
+  /* Globle paleti: açık mavi->yeşil gradyan, siyah metin, mavi vurgu */
+  --bg-top: #a9dbe9;
+  --bg-bottom: #cfe8cf;
+  --bg-soft: #eef5f2;
+  --panel: #ffffff;
+  --text: #10161d;
+  --muted: #435160;
+  --accent: #2d51e0; /* Globle mavisi (butonlar/linkler) */
+  --accent-2: #1f9d4d; /* doğru = yeşil */
+  --border: #c4d2de;
+  --map-empty: #c2cdd6;
+  --map-sea: #2f6fb2;
   --map-stroke: #0b1120;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * {
@@ -24,7 +26,8 @@ body {
 }
 
 body {
-  background: radial-gradient(1200px 600px at 50% -10%, #16233f 0%, var(--bg) 60%);
+  background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  background-attachment: fixed;
   color: var(--text);
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
     Arial, sans-serif;
@@ -41,12 +44,15 @@ body {
 .header {
   text-align: center;
   margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1.5px solid var(--text);
 }
 
 .header h1 {
   margin: 0;
-  font-size: 1.9rem;
-  letter-spacing: -0.02em;
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  color: var(--text);
 }
 
 .flag {
@@ -54,9 +60,11 @@ body {
 }
 
 .tagline {
-  margin: 6px 0 0;
-  color: var(--muted);
-  font-size: 0.95rem;
+  margin: 8px 0 0;
+  color: var(--text);
+  font-size: 0.98rem;
+  font-style: italic;
+  text-align: left;
 }
 
 .modes {
@@ -427,7 +435,7 @@ body {
 }
 
 .name-list .nm.hit {
-  color: #4ade80;
+  color: var(--accent-2);
 }
 
 .controls {
@@ -621,7 +629,7 @@ body {
   padding: 13px 16px;
   border-radius: 10px;
   border: none;
-  background: #2743e0;
+  background: var(--accent);
   color: #fff;
   font-weight: 700;
   font-size: 1rem;
@@ -629,7 +637,7 @@ body {
 }
 
 .modal-btn:hover {
-  background: #1e34c4;
+  filter: brightness(0.92);
 }
 
 @media (max-width: 480px) {

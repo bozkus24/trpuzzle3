@@ -42,19 +42,22 @@ export function proximity(distKm) {
   return Math.max(0, Math.min(1, p))
 }
 
+// Doğru il rengi — koyu yeşil
+export const TARGET_COLOR = '#166534'
+
 /**
- * Yakınlığa göre "sıcaklık" rengi.
- * Uzak = koyu/soğuk (mor-mavi), yakın = sıcak (turuncu-kırmızı), isabet = yeşil.
+ * Yakınlığa göre "sıcaklık" rengi. Mavi yok.
+ * Uzak = beyaza yakın, yaklaştıkça = kırmızı, isabet = koyu yeşil.
  */
 export function heatColor(prox, isTarget = false) {
-  if (isTarget) return '#22c55e' // doğru il
-  // 0 -> koyu mavi, 0.5 -> turuncu, 1'e yakın -> kırmızı
+  if (isTarget) return TARGET_COLOR // doğru il — koyu yeşil
+  // 0 -> beyaza yakın, 1'e yakın -> kırmızı
   const stops = [
-    [0.0, [30, 41, 90]],    // çok uzak — koyu indigo
-    [0.35, [67, 56, 202]],  // uzak — mor
-    [0.6, [220, 100, 40]],  // ılık — turuncu
-    [0.8, [225, 60, 30]],   // sıcak — kırmızı-turuncu
-    [1.0, [200, 20, 20]],   // çok sıcak — kırmızı
+    [0.0, [242, 240, 238]], // çok uzak — kirli beyaz
+    [0.3, [246, 202, 190]], // uzak — açık pembe
+    [0.55, [235, 145, 115]],// ılık — somon
+    [0.75, [219, 84, 62]],  // sıcak — kiremit kırmızısı
+    [1.0, [190, 20, 20]],   // çok sıcak — kırmızı
   ]
   let lo = stops[0]
   let hi = stops[stops.length - 1]

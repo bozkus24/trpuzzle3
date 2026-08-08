@@ -99,20 +99,13 @@ body {
   display: block;
 }
 
+/* İç sınır yok — komşu path'ler arası antialias dikişini
+   fill ile aynı renk ince stroke ile kapatıyoruz */
 .province {
-  stroke: var(--map-stroke);
-  stroke-width: 0.5;
-  transition: fill 0.25s ease;
-}
-
-.province.guessed {
-  stroke: #0b1120;
-  stroke-width: 0.6;
-}
-
-.province.target {
-  stroke: #052e16;
-  stroke-width: 1;
+  stroke: var(--map-empty);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
 /* Tahmin kutusu */
@@ -139,6 +132,17 @@ body {
 
 .guess-row input:focus {
   border-color: var(--accent);
+}
+
+.guess-row input.invalid {
+  border-color: #ef4444;
+}
+
+.guess-error {
+  margin-top: 6px;
+  color: #fca5a5;
+  font-size: 0.85rem;
+  padding-left: 2px;
 }
 
 .guess-btn {

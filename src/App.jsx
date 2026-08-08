@@ -135,7 +135,7 @@ export default function App() {
     const result = won ? `${n} tahminde buldum! 🇹🇷` : `Bulamadım 😅`
     // Tahminlerin sıcaklık şeridi
     const bar = evaluations
-      .map((e) => (e.isTarget ? '🟩' : e.proximity > 0.75 ? '🟥' : e.proximity > 0.55 ? '🟧' : e.proximity > 0.35 ? '🟪' : '🟦'))
+      .map((e) => (e.isTarget ? '🟩' : e.proximity > 0.7 ? '🟥' : e.proximity > 0.45 ? '🟧' : '⬜'))
       .join('')
     const text = `${head}\n${result}\n${bar}`
     navigator.clipboard?.writeText(text).then(

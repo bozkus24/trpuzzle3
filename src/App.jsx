@@ -200,11 +200,20 @@ export default function App() {
 
       {guesses.length > 0 && (
         <section className="panel">
+          <div className="panel-head">En yakın</div>
+
+          <div className="name-list">
+            {display.map((e) => (
+              <span key={e.province.name} className={e.isTarget ? 'nm hit' : 'nm'}>
+                {e.province.name}
+              </span>
+            ))}
+          </div>
+
           <div className="controls">
             <label className="metric">
               <span>
-                {metricLabel}:{' '}
-                <b>{last ? `${last.province.name} — ${last.dist} km` : '—'}</b>
+                {metricLabel}: <b>{last ? `${last.dist} km` : '—'}</b>
               </span>
               <span className="switch">
                 <input
@@ -228,14 +237,6 @@ export default function App() {
                 Pes et
               </button>
             )}
-          </div>
-
-          <div className="name-list">
-            {display.map((e) => (
-              <span key={e.province.name} className={e.isTarget ? 'nm hit' : 'nm'}>
-                {e.province.name}
-              </span>
-            ))}
           </div>
         </section>
       )}

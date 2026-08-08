@@ -96,11 +96,12 @@ export default function TurkeyMap({
           <filter id="lift" x="-20%" y="-20%" width="140%" height="150%">
             <feDropShadow dx="1" dy="3" stdDeviation="2" floodColor="#000000" floodOpacity="0.5" />
           </filter>
-          {/* İllerin birleşim siluetinden Türkiye ulusal sınır bandı */}
+          {/* Türkiye ulusal sınır bandı. Önce dilate ile il-arası dikişleri KAPAT
+              (yoksa erode iç çizgilere dönüşür), sonra kapalı siluetten dış bant. */}
           <filter id="tr-border" x="-5%" y="-5%" width="110%" height="110%">
-            <feMorphology in="SourceAlpha" operator="dilate" radius="0.9" result="dil" />
-            <feMorphology in="SourceAlpha" operator="erode" radius="0.5" result="ero" />
-            <feComposite in="dil" in2="ero" operator="out" result="ring" />
+            <feMorphology in="SourceAlpha" operator="dilate" radius="1.4" result="closed" />
+            <feMorphology in="closed" operator="erode" radius="1.4" result="inner" />
+            <feComposite in="closed" in2="inner" operator="out" result="ring" />
             <feFlood floodColor="#0b0b0b" result="col" />
             <feComposite in="col" in2="ring" operator="in" />
           </filter>

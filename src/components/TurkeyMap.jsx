@@ -79,6 +79,14 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
           <filter id="lift" x="-20%" y="-20%" width="140%" height="150%">
             <feDropShadow dx="1" dy="3" stdDeviation="2" floodColor="#000000" floodOpacity="0.5" />
           </filter>
+          {/* İllerin birleşim siluetinden Türkiye ulusal sınır bandı */}
+          <filter id="tr-border" x="-5%" y="-5%" width="110%" height="110%">
+            <feMorphology in="SourceAlpha" operator="dilate" radius="1.6" result="dil" />
+            <feMorphology in="SourceAlpha" operator="erode" radius="0.9" result="ero" />
+            <feComposite in="dil" in2="ero" operator="out" result="ring" />
+            <feFlood floodColor="#0b0b0b" result="col" />
+            <feComposite in="col" in2="ring" operator="in" />
+          </filter>
         </defs>
 
         {/* Deniz zemini (üst/alt marjları da kaplasın) */}
@@ -94,6 +102,13 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
           preserveAspectRatio="none"
           clipPath="url(#land-mask)"
         />
+
+        {/* Türkiye ulusal sınırı — belirgin koyu bant */}
+        <g filter="url(#tr-border)" opacity="0.9">
+          {paths.map((p) => (
+            <path key={'b-' + p.name} d={p.d} fill="#000" />
+          ))}
+        </g>
 
         {/* Yükseltilmiş katman: boyalı iller 3B kabarık (iki geçiş) */}
         <g className="raised" filter="url(#lift)">

@@ -32,9 +32,10 @@ npm run preview  # üretim derlemesini önizle
 - **React 18** + **Vite**
 - **d3-geo** (`geoTransform` ile equirectangular hizalama; sınır mesafesi 3B küresel)
 - İl sınır verisi: [alpers/Turkey-Maps-GeoJSON](https://github.com/alpers/Turkey-Maps-GeoJSON) (`tr-cities.json`)
-- Uydu zemini: NASA Blue Marble (Visible Earth, kamu malı) — Türkiye bölgesi
-  kırpılıp gömüldü; iller equirectangular projeksiyonla görsele hizalanır ve
-  görsel il siluetine kırpılır (keskin kıyı).
+- Kabartma zemin: yükseklik verisinden (earth-bump / NASA-Natural Earth türevi)
+  hillshade + hipsometrik renklendirmeyle üretilen shaded-relief; Türkiye bölgesi
+  gömülü. İller equirectangular projeksiyonla görsele hizalanır ve görsel il
+  siluetine kırpılır (keskin kıyı).
 
 ## Dosya yapısı
 

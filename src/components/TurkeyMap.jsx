@@ -3,6 +3,7 @@ import { geoPath, geoTransform } from 'd3-geo'
 import { geo } from '../lib/provinces'
 import { TARGET_COLOR } from '../lib/game'
 import { SAT, SAT_BOUNDS } from '../data/satellite'
+import { LAND } from '../data/land'
 
 const { west, east, north, south } = SAT_BOUNDS
 const HEIGHT = 440
@@ -41,6 +42,12 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
     return { paths, cy }
   }, [])
 
+  // Kara maskesi (Türkiye + komşular) — relief'i karaya kırpar, deniz mavi kalır
+  const landPath = useMemo(
+    () => pathGen({ type: 'MultiPolygon', coordinates: LAND }),
+    []
+  )
+
   const raised = useMemo(() => {
     const nameSet = new Set(
       paths
@@ -66,31 +73,27 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
         aria-label="Türkiye uydu haritası"
       >
         <defs>
-          <clipPath id="tr-land">
-            {paths.map((p) => (
-              <path key={p.name} d={p.d} />
-            ))}
+          <clipPath id="land-mask">
+            <path d={landPath} />
           </clipPath>
-          <filter id="coast" x="-8%" y="-8%" width="116%" height="130%">
-            <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#08243a" floodOpacity="0.55" />
-          </filter>
           <filter id="lift" x="-20%" y="-20%" width="140%" height="150%">
             <feDropShadow dx="1" dy="3" stdDeviation="2" floodColor="#000000" floodOpacity="0.5" />
           </filter>
         </defs>
 
-        {/* Gerçek uydu zemini — Türkiye siluetine kırpılı, hafif kıyı gölgesi */}
-        <g filter="url(#coast)">
-          <image
-            href={SAT}
-            x="0"
-            y="0"
-            width={WIDTH}
-            height={HEIGHT}
-            preserveAspectRatio="none"
-            clipPath="url(#tr-land)"
-          />
-        </g>
+        {/* Deniz zemini (üst/alt marjları da kaplasın) */}
+        <rect x="0" y={-DEPTH} width={WIDTH} height={HEIGHT + DEPTH + 14} fill="#2f6fb2" />
+
+        {/* Kabartma zemin karaya kırpılı: Türkiye + komşu kara; deniz mavi kalır */}
+        <image
+          href={SAT}
+          x="0"
+          y="0"
+          width={WIDTH}
+          height={HEIGHT}
+          preserveAspectRatio="none"
+          clipPath="url(#land-mask)"
+        />
 
         {/* Yükseltilmiş katman: boyalı iller 3B kabarık (iki geçiş) */}
         <g className="raised" filter="url(#lift)">

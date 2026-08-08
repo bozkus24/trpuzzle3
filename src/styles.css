@@ -7,7 +7,8 @@
   --accent: #e30a17;
   --accent-2: #22c55e;
   --border: #24314f;
-  --map-empty: #1e293b;
+  --map-empty: #cdd6dc; /* açık land (boyanmamış iller) */
+  --map-sea: #b7d6e2; /* açık mavi deniz (harita zemini) */
   --map-stroke: #0b1120;
   color-scheme: dark;
 }
@@ -86,7 +87,7 @@ body {
 }
 
 .map-wrap {
-  background: var(--bg-soft);
+  background: linear-gradient(180deg, #c3dfea 0%, var(--map-sea) 100%);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 8px;

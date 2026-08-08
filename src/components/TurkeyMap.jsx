@@ -1,13 +1,11 @@
 import { useMemo } from 'react'
 import { geoMercator, geoPath } from 'd3-geo'
-import { geo, provinces, areNeighbors } from '../lib/provinces'
+import { geo } from '../lib/provinces'
 import { TARGET_COLOR } from '../lib/game'
 
 const WIDTH = 1000
 const HEIGHT = 440
 const DEPTH = 5 // 3B kabarma yüksekliği (px)
-
-const byName = new Map(provinces.map((p) => [p.name, p]))
 
 // "rgb(r,g,b)" veya "#rrggbb" -> [r,g,b]
 function parseColor(c) {
@@ -49,21 +47,22 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
 
   // Yükseltilecek (boyalı) iller — kuzeyden güneye sırala ki 3B üst üste doğru binsin
   const raised = useMemo(() => {
-    const names = paths
-      .map((p) => p.name)
-      .filter((n) => colors[n] || (revealed && target && n === target.name))
-    const nameSet = new Set(names)
+    const nameSet = new Set(
+      paths
+        .map((p) => p.name)
+        .filter((n) => colors[n] || (revealed && target && n === target.name))
+    )
     const list = paths
       .filter((p) => nameSet.has(p.name))
       .map((p) => {
         const isTarget = revealed && target && p.name === target.name
         const top = isTarget ? TARGET_COLOR : colors[p.name]
-        // Bu boyalı ilin, boyalı başka bir ille sınırdaş olup olmadığı
-        const me = byName.get(p.name)
-        const hasNeighbor =
-          me != null &&
-          names.some((n) => n !== p.name && areNeighbors(me, byName.get(n)))
-        return { ...p, top, side: darken(top), hasNeighbor }
+        return {
+          ...p,
+          top,
+          side: darken(top, 0.62), // yan duvar — üstten koyu
+          outline: darken(top, 0.4), // ince koyu sınır çizgisi
+        }
       })
     return list.sort((a, b) => cy[a.name] - cy[b.name])
   }, [paths, colors, target, revealed, cy])
@@ -78,10 +77,10 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
       >
         <defs>
           <filter id="lift" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#000" floodOpacity="0.55" />
+            <feDropShadow dx="0" dy="4" stdDeviation="3.5" floodColor="#1a2a33" floodOpacity="0.45" />
           </filter>
           <filter id="land" x="-10%" y="-10%" width="120%" height="130%">
-            <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#000" floodOpacity="0.4" />
+            <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#5b7280" floodOpacity="0.35" />
           </filter>
         </defs>
 
@@ -107,13 +106,13 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
               {Array.from({ length: DEPTH }).map((_, i) => (
                 <path key={i} d={p.d} fill={p.side} transform={`translate(0, ${-i})`} />
               ))}
-              {/* üst yüzey — sınırdaş boyalı il varsa ince ayırıcı çizgi */}
+              {/* üst yüzey — her il koyu ince sınır çizgisiyle (referans gibi) */}
               <path
                 d={p.d}
                 fill={p.top}
                 transform={`translate(0, ${-DEPTH})`}
-                stroke={p.hasNeighbor ? darken(p.top, 0.5) : 'none'}
-                strokeWidth={p.hasNeighbor ? 1 : 0}
+                stroke={p.outline}
+                strokeWidth={0.9}
                 strokeLinejoin="round"
               >
                 <title>{p.name}</title>

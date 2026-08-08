@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import TurkeyMap from './components/TurkeyMap'
 import GuessInput from './components/GuessInput'
-import { findProvince, MAX_BORDER_KM, MAX_DISTANCE_KM } from './lib/provinces'
+import { findProvince, MAX_BORDER_KM } from './lib/provinces'
 import {
   dailyProvince,
   randomProvince,
@@ -25,9 +25,8 @@ export default function App() {
   const [won, setWon] = useState(false)
   const [gaveUp, setGaveUp] = useState(false)
 
-  // Görünüm ayarları
-  const [useBorder, setUseBorder] = useState(true) // en yakın sınır mı, merkez mi
-  const [byGuessOrder, setByGuessOrder] = useState(false) // sıralama: tahmin sırası mı, yakınlık mı
+  // Görünüm ayarı: sıralama (tahmin sırası mı, yakınlık mı)
+  const [byGuessOrder, setByGuessOrder] = useState(false)
 
   // Günün ili ilerlemesini yükle
   useEffect(() => {
@@ -81,16 +80,14 @@ export default function App() {
     [guesses, target]
   )
 
-  // Seçili ölçüye (sınır/merkez) göre mesafe, yakınlık ve renk
-  const metricMax = useBorder ? MAX_BORDER_KM : MAX_DISTANCE_KM
+  // En yakın sınır mesafesine göre yakınlık ve renk
   const evals = useMemo(
     () =>
       evaluations.map((e) => {
-        const dist = useBorder ? e.borderKm : e.centroidKm
-        const prox = proximity(dist, metricMax)
-        return { ...e, dist, prox, color: heatColor(prox, e.isTarget) }
+        const prox = proximity(e.borderKm, MAX_BORDER_KM)
+        return { ...e, dist: e.borderKm, prox, color: heatColor(prox, e.isTarget) }
       }),
-    [evaluations, useBorder, metricMax]
+    [evaluations]
   )
 
   // Harita için renk eşlemesi
@@ -150,7 +147,6 @@ export default function App() {
   }
 
   const guessedNames = useMemo(() => new Set(guesses.map((g) => g.name)), [guesses])
-  const metricLabel = useBorder ? 'En yakın sınır' : 'En yakın (merkez)'
 
   return (
     <div className="app">
@@ -211,22 +207,9 @@ export default function App() {
           </div>
 
           <div className="controls">
-            <label className="metric">
-              <span>
-                {metricLabel}: <b>{last ? `${last.dist} km` : '—'}</b>
-              </span>
-              <span className="switch">
-                <input
-                  type="checkbox"
-                  checked={useBorder}
-                  onChange={(ev) => setUseBorder(ev.target.checked)}
-                  aria-label="En yakın sınır ölçüsü"
-                />
-                <span className="track">
-                  <span className="thumb" />
-                </span>
-              </span>
-            </label>
+            <span className="metric">
+              En yakın sınır: <b>{last ? `${last.dist} km` : '—'}</b>
+            </span>
 
             <button className="linkbtn" onClick={() => setByGuessOrder((v) => !v)}>
               {byGuessOrder ? 'Yakınlığa göre sırala' : 'Tahmin sırasına göre sırala'}

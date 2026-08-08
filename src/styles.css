@@ -409,15 +409,17 @@ body {
 .name-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 30px;
-  margin: 6px 0 14px;
+  gap: 14px 40px;
+  margin: 8px 0 16px;
   padding: 0 2px;
+  line-height: 1.5;
 }
 
 .name-list .nm {
   font-weight: 600;
-  font-size: 0.98rem;
+  font-size: 1rem;
   color: var(--text);
+  white-space: nowrap;
 }
 
 .name-list .nm.hit {

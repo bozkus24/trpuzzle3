@@ -2,8 +2,11 @@ import { useMemo } from 'react'
 import { geoPath, geoTransform } from 'd3-geo'
 import { geo } from '../lib/provinces'
 import { TARGET_COLOR } from '../lib/game'
-import { SAT_BOUNDS, SAT_FLAT, SAT_RELIEF } from '../data/satellite'
+import { SAT_BOUNDS, SAT_RELIEF } from '../data/satellite'
 import { LAND } from '../data/land'
+
+// Kabartmasız (düz) mod: kara için tek renk metalik ton
+const FLAT_LAND = '#aab2ba'
 
 const { west, east, north, south } = SAT_BOUNDS
 const HEIGHT = 440
@@ -110,16 +113,28 @@ export default function TurkeyMap({
         {/* Deniz zemini */}
         <rect x="0" y="0" width={WIDTH} height={HEIGHT} fill="#2f6fb2" />
 
-        {/* Zemin karaya kırpılı: Türkiye + komşu kara; deniz mavi kalır */}
-        <image
-          href={relief ? SAT_RELIEF : SAT_FLAT}
-          x="0"
-          y="0"
-          width={WIDTH}
-          height={HEIGHT}
-          preserveAspectRatio="none"
-          clipPath="url(#land-mask)"
-        />
+        {/* Zemin karaya kırpılı: Türkiye + komşu kara; deniz mavi kalır.
+            Kabartma modunda relief görseli, düz modda tek renk metalik. */}
+        {relief ? (
+          <image
+            href={SAT_RELIEF}
+            x="0"
+            y="0"
+            width={WIDTH}
+            height={HEIGHT}
+            preserveAspectRatio="none"
+            clipPath="url(#land-mask)"
+          />
+        ) : (
+          <rect
+            x="0"
+            y="0"
+            width={WIDTH}
+            height={HEIGHT}
+            fill={FLAT_LAND}
+            clipPath="url(#land-mask)"
+          />
+        )}
 
         {/* Türkiye ulusal sınırı — belirgin koyu bant */}
         <g filter="url(#tr-border)" opacity="0.9">

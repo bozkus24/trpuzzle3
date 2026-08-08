@@ -98,26 +98,31 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
           ))}
         </g>
 
-        {/* Yükseltilmiş katman: boyalı iller 3B kabarık */}
+        {/* Yükseltilmiş katman: boyalı iller 3B kabarık.
+            İKİ GEÇİŞ: önce TÜM yan duvarlar, sonra TÜM üst yüzeyler —
+            böylece hiçbir ilin üstü komşusunun duvarıyla örtülmez, hepsi aynı seviyede. */}
         <g className="raised" filter="url(#lift)">
+          {/* 1. geçiş: yan duvarlar */}
           {raised.map((p) => (
-            <g key={p.name}>
-              {/* yan duvarlar (aşağıdan yukarı) */}
+            <g key={'s-' + p.name}>
               {Array.from({ length: DEPTH }).map((_, i) => (
                 <path key={i} d={p.d} fill={p.side} transform={`translate(0, ${-i})`} />
               ))}
-              {/* üst yüzey — her il koyu ince sınır çizgisiyle (referans gibi) */}
-              <path
-                d={p.d}
-                fill={p.top}
-                transform={`translate(0, ${-DEPTH})`}
-                stroke={p.outline}
-                strokeWidth={0.9}
-                strokeLinejoin="round"
-              >
-                <title>{p.name}</title>
-              </path>
             </g>
+          ))}
+          {/* 2. geçiş: üst yüzeyler — hepsi aynı yükseklikte, koyu ince sınır çizgisiyle */}
+          {raised.map((p) => (
+            <path
+              key={'t-' + p.name}
+              d={p.d}
+              fill={p.top}
+              transform={`translate(0, ${-DEPTH})`}
+              stroke={p.outline}
+              strokeWidth={0.9}
+              strokeLinejoin="round"
+            >
+              <title>{p.name}</title>
+            </path>
           ))}
         </g>
       </svg>

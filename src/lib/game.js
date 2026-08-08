@@ -3,6 +3,8 @@ import {
   borderDistanceKm,
   MAX_BORDER_KM,
   NEIGHBOR_EPS_KM,
+  distanceKm,
+  MAX_DISTANCE_KM,
 } from './provinces'
 
 /** YYYY-MM-DD (yerel saat) — "günün ili" için tohum. */
@@ -39,25 +41,25 @@ export function randomProvince(exclude) {
 }
 
 /**
- * En yakın sınır mesafesini 0..1 yakınlık oranına çevirir (1 = sınırdaş/isabet).
- * Eğri (gamma>1) uzak illeri hızla beyaza iterken, yakın/komşuları kırmızı tutar.
+ * Mesafeyi 0..1 yakınlık oranına çevirir (1 = isabet).
+ * Eğri (gamma>1) uzak illeri hızla açığa iterken, yakınları koyu tutar.
  */
-export function proximity(borderKm) {
-  if (borderKm <= 0) return 1
-  const x = Math.min(1, borderKm / MAX_BORDER_KM)
+export function proximity(dist, max = MAX_BORDER_KM) {
+  if (dist <= 0) return 1
+  const x = Math.min(1, dist / max)
   return Math.max(0, (1 - x) ** 1.4)
 }
 
-// Doğru il rengi — koyu yeşil
-export const TARGET_COLOR = '#166534'
+// Doğru il rengi — yeşil (referans tonu)
+export const TARGET_COLOR = '#3f8a2e'
 
 /**
  * Yakınlığa göre "sıcaklık" rengi. Mavi yok.
  * Uzak = açık krem, yaklaştıkça krem -> turuncu -> kırmızı -> koyu bordo.
- * En uzak seviye kremden daha açık; en yakın (0 km) koyu bordo. İsabet = koyu yeşil.
+ * En uzak seviye kremden daha açık; en yakın (0 km) koyu bordo. İsabet = yeşil.
  */
 export function heatColor(prox, isTarget = false) {
-  if (isTarget) return TARGET_COLOR // doğru il — koyu yeşil
+  if (isTarget) return TARGET_COLOR // doğru il — yeşil
   // 0 (en uzak) -> soluk krem ... 1 (en yakın) -> koyu bordo
   const stops = [
     [0.0, [250, 240, 222]], // en uzak — soluk krem (kremden açık)
@@ -80,18 +82,15 @@ export function heatColor(prox, isTarget = false) {
   return `rgb(${c[0]}, ${c[1]}, ${c[2]})`
 }
 
-/** Bir tahmini değerlendirir: en yakın sınır mesafesi, komşuluk, yakınlık, renk. */
+/** Bir tahmini değerlendirir: en yakın sınır + merkez mesafesi. Renk/yakınlık App'te seçilir. */
 export function evaluateGuess(guess, target) {
   const border = borderDistanceKm(guess, target)
   const isTarget = guess.name === target.name
-  const neighbor = !isTarget && border <= NEIGHBOR_EPS_KM
-  const prox = proximity(border)
   return {
     province: guess,
-    borderKm: Math.round(border),
-    neighbor,
-    proximity: prox,
-    color: heatColor(prox, isTarget),
     isTarget,
+    borderKm: Math.round(border),
+    centroidKm: Math.round(distanceKm(guess, target)),
+    neighbor: !isTarget && border <= NEIGHBOR_EPS_KM,
   }
 }

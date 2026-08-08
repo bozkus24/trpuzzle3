@@ -1,12 +1,14 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import TurkeyMap from './components/TurkeyMap'
 import GuessInput from './components/GuessInput'
-import { findProvince } from './lib/provinces'
+import { findProvince, MAX_BORDER_KM, MAX_DISTANCE_KM } from './lib/provinces'
 import {
   dailyProvince,
   randomProvince,
   todayKey,
   evaluateGuess,
+  proximity,
+  heatColor,
 } from './lib/game'
 
 const DAILY_STORE = (key) => `iller-globle:daily:${key}`
@@ -22,6 +24,10 @@ export default function App() {
   const [guesses, setGuesses] = useState([]) // il nesneleri (tahmin sırası)
   const [won, setWon] = useState(false)
   const [gaveUp, setGaveUp] = useState(false)
+
+  // Görünüm ayarları
+  const [useBorder, setUseBorder] = useState(true) // en yakın sınır mı, merkez mi
+  const [byGuessOrder, setByGuessOrder] = useState(false) // sıralama: tahmin sırası mı, yakınlık mı
 
   // Günün ili ilerlemesini yükle
   useEffect(() => {
@@ -75,23 +81,35 @@ export default function App() {
     [guesses, target]
   )
 
+  // Seçili ölçüye (sınır/merkez) göre mesafe, yakınlık ve renk
+  const metricMax = useBorder ? MAX_BORDER_KM : MAX_DISTANCE_KM
+  const evals = useMemo(
+    () =>
+      evaluations.map((e) => {
+        const dist = useBorder ? e.borderKm : e.centroidKm
+        const prox = proximity(dist, metricMax)
+        return { ...e, dist, prox, color: heatColor(prox, e.isTarget) }
+      }),
+    [evaluations, useBorder, metricMax]
+  )
+
   // Harita için renk eşlemesi
   const colors = useMemo(() => {
     const m = {}
-    for (const e of evaluations) m[e.province.name] = e.color
+    for (const e of evals) m[e.province.name] = e.color
     return m
-  }, [evaluations])
+  }, [evals])
 
-  // Yakınlığa göre sıralı: doğru il her zaman en üstte, sonra en yakın sınır
-  const sorted = useMemo(
+  // Yakınlığa göre sıralı (doğru il en üstte)
+  const byDist = useMemo(
     () =>
-      [...evaluations].sort(
-        (a, b) => (b.isTarget ? 1 : 0) - (a.isTarget ? 1 : 0) || a.borderKm - b.borderKm
+      [...evals].sort(
+        (a, b) => (b.isTarget ? 1 : 0) - (a.isTarget ? 1 : 0) || a.dist - b.dist
       ),
-    [evaluations]
+    [evals]
   )
-
-  const closest = sorted[0]
+  const closest = byDist[0]
+  const display = byGuessOrder ? evals : byDist
 
   function newPractice() {
     setPracticeTarget(randomProvince(practiceTarget))
@@ -118,16 +136,9 @@ export default function App() {
   const [copied, setCopied] = useState(false)
   function share() {
     const n = guesses.length
-    const head =
-      mode === 'daily'
-        ? `İller Globle — ${dateKey}`
-        : `İller Globle — Pratik`
-    const result = won ? `${n} tahminde buldum! 🇹🇷` : `Bulamadım 😅`
-    // Tahminlerin sıcaklık şeridi
-    const bar = evaluations
-      .map((e) => (e.isTarget ? '🟩' : e.proximity > 0.7 ? '🟥' : e.proximity > 0.45 ? '🟧' : '⬜'))
-      .join('')
-    const text = `${head}\n${result}\n${bar}`
+    const head = mode === 'daily' ? `İller Globle — ${dateKey}` : `İller Globle — Pratik`
+    const result = won ? `${n} tahminde buldum.` : `Bulamadım.`
+    const text = `${head}\n${result}`
     navigator.clipboard?.writeText(text).then(
       () => {
         setCopied(true)
@@ -138,13 +149,12 @@ export default function App() {
   }
 
   const guessedNames = useMemo(() => new Set(guesses.map((g) => g.name)), [guesses])
+  const metricLabel = useBorder ? 'En yakın sınır' : 'En yakın (merkez)'
 
   return (
     <div className="app">
       <header className="header">
-        <h1>
-          <span className="flag">🇹🇷</span> İller Globle
-        </h1>
+        <h1>İller Globle</h1>
         <p className="tagline">Gizli ili tahmin et — her tahmin seni ısıtır ya da soğutur.</p>
       </header>
 
@@ -169,17 +179,11 @@ export default function App() {
         <GuessInput onGuess={handleGuess} disabled={finished} guessedNames={guessedNames} />
       )}
 
-      {closest && !finished && (
-        <div className="status">
-          En yakın sınır: <b>{closest.province.name}</b> — {closest.borderKm} km
-        </div>
-      )}
-
       {finished && (
         <div className={'result ' + (won ? 'win' : 'lose')}>
           {won ? (
             <p>
-              🎉 <b>{target.name}</b>! {guesses.length} tahminde buldun.
+              <b>{target.name}</b>! {guesses.length} tahminde buldun.
             </p>
           ) : (
             <p>
@@ -187,30 +191,56 @@ export default function App() {
             </p>
           )}
           <div className="result-actions">
-            <button onClick={share}>{copied ? 'Kopyalandı ✓' : 'Sonucu paylaş'}</button>
+            <button onClick={share}>{copied ? 'Kopyalandı' : 'Sonucu paylaş'}</button>
             {mode === 'practice' && <button onClick={newPractice}>Yeni oyun</button>}
           </div>
         </div>
       )}
 
-      {!finished && guesses.length > 0 && (
-        <div className="toolbar">
-          <span className="count">{guesses.length} tahmin</span>
-          <button className="giveup" onClick={giveUp}>
-            Pes et
-          </button>
-        </div>
-      )}
+      {guesses.length > 0 && (
+        <section className="panel">
+          <div className="panel-head">En yakın</div>
 
-      <ul className="guess-list">
-        {sorted.map((e) => (
-          <li key={e.province.name} className={e.isTarget ? 'hit' : ''}>
-            <span className="swatch" style={{ background: e.color }} />
-            <span className="pname">{e.province.name}</span>
-            <span className="dist">{e.isTarget ? 'Doğru!' : `${e.borderKm} km`}</span>
-          </li>
-        ))}
-      </ul>
+          <ul className="guess-grid">
+            {display.map((e) => (
+              <li key={e.province.name} className={e.isTarget ? 'cell hit' : 'cell'}>
+                <span className="swatch" style={{ background: e.color }} />
+                <span className="pname">{e.province.name}</span>
+                <span className="dist">{e.isTarget ? 'Doğru' : `${e.dist} km`}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="controls">
+            <label className="metric">
+              <span>
+                {metricLabel}: <b>{closest ? closest.dist : 0} km</b>
+              </span>
+              <span className="switch">
+                <input
+                  type="checkbox"
+                  checked={useBorder}
+                  onChange={(ev) => setUseBorder(ev.target.checked)}
+                  aria-label="En yakın sınır ölçüsü"
+                />
+                <span className="track">
+                  <span className="thumb" />
+                </span>
+              </span>
+            </label>
+
+            <button className="linkbtn" onClick={() => setByGuessOrder((v) => !v)}>
+              {byGuessOrder ? 'Yakınlığa göre sırala' : 'Tahmin sırasına göre sırala'}
+            </button>
+
+            {!finished && (
+              <button className="linkbtn giveup" onClick={giveUp}>
+                Pes et
+              </button>
+            )}
+          </div>
+        </section>
+      )}
     </div>
   )
 }

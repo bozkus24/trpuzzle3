@@ -30,6 +30,24 @@ export default function App() {
   // Görünüm ayarı: sıralama (tahmin sırası mı, yakınlık mı)
   const [byGuessOrder, setByGuessOrder] = useState(false)
 
+  // Harita: kabartma (relief) görünümü — varsayılan kapalı (düz)
+  const [relief, setRelief] = useState(() => {
+    try {
+      return localStorage.getItem('iller-globle:relief') === '1'
+    } catch {
+      return false
+    }
+  })
+  function toggleRelief() {
+    setRelief((v) => {
+      const nv = !v
+      try {
+        localStorage.setItem('iller-globle:relief', nv ? '1' : '0')
+      } catch {}
+      return nv
+    })
+  }
+
   // İstatistik popup'ı
   const [stats, setStats] = useState(() => loadStats())
   const [showStats, setShowStats] = useState(false)
@@ -190,7 +208,13 @@ export default function App() {
         </button>
       </div>
 
-      <TurkeyMap colors={colors} target={target} revealed={finished} />
+      <TurkeyMap
+        colors={colors}
+        target={target}
+        revealed={finished}
+        relief={relief}
+        onToggleRelief={toggleRelief}
+      />
 
       {!finished && (
         <GuessInput onGuess={handleGuess} disabled={finished} guessedNames={guessedNames} />

@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { geoPath, geoTransform } from 'd3-geo'
 import { geo } from '../lib/provinces'
 import { TARGET_COLOR } from '../lib/game'
-import { SAT, SAT_BOUNDS } from '../data/satellite'
+import { SAT_BOUNDS, SAT_FLAT, SAT_RELIEF } from '../data/satellite'
 import { LAND } from '../data/land'
 
 const { west, east, north, south } = SAT_BOUNDS
@@ -34,7 +34,13 @@ function darken(c, f) {
  * Gerçekçi uydu zeminli Türkiye haritası.
  * Uydu görseli il siluetine kırpılır (kıyı keskin), üstüne 3B boyalı iller gelir.
  */
-export default function TurkeyMap({ colors = {}, target = null, revealed = false }) {
+export default function TurkeyMap({
+  colors = {},
+  target = null,
+  revealed = false,
+  relief = false,
+  onToggleRelief,
+}) {
   const { paths, cy } = useMemo(() => {
     const paths = geo.features.map((f) => ({ name: f.properties.name, d: pathGen(f) }))
     const cy = {}
@@ -66,6 +72,17 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
 
   return (
     <div className="map-wrap">
+      {onToggleRelief && (
+        <button
+          type="button"
+          className={'map-toggle' + (relief ? ' on' : '')}
+          onClick={onToggleRelief}
+          aria-pressed={relief}
+          title="Kabartma (relief) görünümünü aç/kapat"
+        >
+          Kabartma
+        </button>
+      )}
       <svg
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         className="tr-map"
@@ -92,9 +109,9 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
         {/* Deniz zemini */}
         <rect x="0" y="0" width={WIDTH} height={HEIGHT} fill="#2f6fb2" />
 
-        {/* Kabartma zemin karaya kırpılı: Türkiye + komşu kara; deniz mavi kalır */}
+        {/* Zemin karaya kırpılı: Türkiye + komşu kara; deniz mavi kalır */}
         <image
-          href={SAT}
+          href={relief ? SAT_RELIEF : SAT_FLAT}
           x="0"
           y="0"
           width={WIDTH}

@@ -87,6 +87,7 @@ body {
 }
 
 .map-wrap {
+  position: relative;
   background: #2f6fb2;
   border: none;
   border-radius: 16px;
@@ -101,6 +102,43 @@ body {
   height: auto;
   display: block;
   border-radius: 16px;
+}
+
+.map-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(11, 17, 32, 0.55);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.map-toggle::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #64748b;
+  margin-right: 7px;
+  vertical-align: middle;
+}
+
+.map-toggle.on {
+  background: rgba(34, 139, 34, 0.72);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.map-toggle.on::before {
+  background: #6ee7a0;
 }
 
 /* İç sınır yok — komşu path'ler arası antialias dikişini

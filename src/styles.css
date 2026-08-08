@@ -7,8 +7,8 @@
   --accent: #e30a17;
   --accent-2: #22c55e;
   --border: #24314f;
-  --map-empty: #cdd6dc; /* açık land (boyanmamış iller) */
-  --map-sea: #b7d6e2; /* açık mavi deniz (harita zemini) */
+  --map-empty: #c2cdd6; /* land (boyanmamış iller) */
+  --map-sea: #94c2d6; /* mavi deniz (harita zemini) — land ile kontrast için daha doygun */
   --map-stroke: #0b1120;
   color-scheme: dark;
 }
@@ -87,7 +87,7 @@ body {
 }
 
 .map-wrap {
-  background: linear-gradient(180deg, #c3dfea 0%, var(--map-sea) 100%);
+  background: linear-gradient(180deg, #a6cfe0 0%, var(--map-sea) 100%);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 8px;
@@ -530,7 +530,7 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(6, 12, 24, 0.28);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -563,7 +563,7 @@ body {
 
 .modal-title {
   text-align: center;
-  margin: 2px 0 6px;
+  margin: 2px 0 18px;
   font-size: 1.9rem;
   color: #0b1120;
 }

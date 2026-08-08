@@ -39,17 +39,11 @@ export default function StatsModal({
 
         <h2 className="modal-title">İstatistikler</h2>
 
-        <p className="modal-sub">
-          {won ? (
-            <>
-              <b>{answer}</b> — {guessCount} tahminde buldun
-            </>
-          ) : (
-            <>
-              Doğru cevap: <b>{answer}</b>
-            </>
-          )}
-        </p>
+        {!won && (
+          <p className="modal-sub">
+            Doğru cevap: <b>{answer}</b>
+          </p>
+        )}
 
         <div className="stat-rows">
           {rows.map(([label, value]) => (

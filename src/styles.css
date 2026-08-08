@@ -405,6 +405,25 @@ body {
   flex: none;
 }
 
+/* Sade isim listesi (kutu/renk/km yok) */
+.name-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 14px;
+  padding: 0 2px;
+}
+
+.name-list .nm {
+  font-weight: 600;
+  font-size: 0.98rem;
+  color: var(--text);
+}
+
+.name-list .nm.hit {
+  color: #4ade80;
+}
+
 .controls {
   display: flex;
   align-items: center;

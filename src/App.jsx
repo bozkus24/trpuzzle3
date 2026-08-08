@@ -108,8 +108,9 @@ export default function App() {
       ),
     [evals]
   )
-  const closest = byDist[0]
   const display = byGuessOrder ? evals : byDist
+  // Bilgi satırı yalnızca SON yazılan ile göre yorum yapar
+  const last = evals.length ? evals[evals.length - 1] : null
 
   function newPractice() {
     setPracticeTarget(randomProvince(practiceTarget))
@@ -199,22 +200,11 @@ export default function App() {
 
       {guesses.length > 0 && (
         <section className="panel">
-          <div className="panel-head">En yakın</div>
-
-          <ul className="guess-grid">
-            {display.map((e) => (
-              <li key={e.province.name} className={e.isTarget ? 'cell hit' : 'cell'}>
-                <span className="swatch" style={{ background: e.color }} />
-                <span className="pname">{e.province.name}</span>
-                <span className="dist">{e.isTarget ? 'Doğru' : `${e.dist} km`}</span>
-              </li>
-            ))}
-          </ul>
-
           <div className="controls">
             <label className="metric">
               <span>
-                {metricLabel}: <b>{closest ? closest.dist : 0} km</b>
+                {metricLabel}:{' '}
+                <b>{last ? `${last.province.name} — ${last.dist} km` : '—'}</b>
               </span>
               <span className="switch">
                 <input
@@ -238,6 +228,14 @@ export default function App() {
                 Pes et
               </button>
             )}
+          </div>
+
+          <div className="name-list">
+            {display.map((e) => (
+              <span key={e.province.name} className={e.isTarget ? 'nm hit' : 'nm'}>
+                {e.province.name}
+              </span>
+            ))}
           </div>
         </section>
       )}

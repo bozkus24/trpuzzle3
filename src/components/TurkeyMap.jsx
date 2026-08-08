@@ -5,7 +5,7 @@ import { TARGET_COLOR } from '../lib/game'
 
 const WIDTH = 1000
 const HEIGHT = 440
-const DEPTH = 5 // 3B kabarma yüksekliği (px)
+const DEPTH = 4 // 3B kabarma yüksekliği (px) — referanstaki gibi hafif
 
 // "rgb(r,g,b)" veya "#rrggbb" -> [r,g,b]
 function parseColor(c) {
@@ -60,8 +60,8 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
         return {
           ...p,
           top,
-          side: darken(top, 0.62), // yan duvar — üstten koyu
-          outline: darken(top, 0.4), // ince koyu sınır çizgisi
+          side: '#141414', // yan duvar — siyah (referans gibi)
+          outline: '#000000', // kalın siyah sınır
         }
       })
     return list.sort((a, b) => cy[a.name] - cy[b.name])
@@ -77,7 +77,7 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
       >
         <defs>
           <filter id="lift" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="4" stdDeviation="3.5" floodColor="#1a2a33" floodOpacity="0.45" />
+            <feDropShadow dx="1" dy="3" stdDeviation="2" floodColor="#000000" floodOpacity="0.5" />
           </filter>
           <filter id="land" x="-10%" y="-10%" width="120%" height="130%">
             <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#5b7280" floodOpacity="0.35" />
@@ -118,7 +118,7 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
               fill={p.top}
               transform={`translate(0, ${-DEPTH})`}
               stroke={p.outline}
-              strokeWidth={0.9}
+              strokeWidth={1.8}
               strokeLinejoin="round"
             >
               <title>{p.name}</title>

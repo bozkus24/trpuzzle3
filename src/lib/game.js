@@ -1,4 +1,9 @@
-import { provinces, distanceKm, MAX_DISTANCE_KM } from './provinces'
+import {
+  provinces,
+  borderDistanceKm,
+  MAX_BORDER_KM,
+  NEIGHBOR_EPS_KM,
+} from './provinces'
 
 /** YYYY-MM-DD (yerel saat) — "günün ili" için tohum. */
 export function todayKey(date = new Date()) {
@@ -34,12 +39,13 @@ export function randomProvince(exclude) {
 }
 
 /**
- * Mesafeyi 0..1 yakınlık oranına çevirir (1 = tam isabet).
+ * En yakın sınır mesafesini 0..1 yakınlık oranına çevirir (1 = sınırdaş/isabet).
+ * Eğri (gamma>1) uzak illeri hızla beyaza iterken, yakın/komşuları kırmızı tutar.
  */
-export function proximity(distKm) {
-  if (distKm <= 0) return 1
-  const p = 1 - distKm / MAX_DISTANCE_KM
-  return Math.max(0, Math.min(1, p))
+export function proximity(borderKm) {
+  if (borderKm <= 0) return 1
+  const x = Math.min(1, borderKm / MAX_BORDER_KM)
+  return Math.max(0, (1 - x) ** 1.4)
 }
 
 // Doğru il rengi — koyu yeşil
@@ -73,18 +79,18 @@ export function heatColor(prox, isTarget = false) {
   return `rgb(${c[0]}, ${c[1]}, ${c[2]})`
 }
 
-/** Bir tahmini değerlendirir: mesafe, yakınlık, renk, isabet. */
+/** Bir tahmini değerlendirir: en yakın sınır mesafesi, komşuluk, yakınlık, renk. */
 export function evaluateGuess(guess, target) {
-  const dist = distanceKm(guess, target)
+  const border = borderDistanceKm(guess, target)
   const isTarget = guess.name === target.name
-  const prox = proximity(dist)
+  const neighbor = !isTarget && border <= NEIGHBOR_EPS_KM
+  const prox = proximity(border)
   return {
     province: guess,
-    distanceKm: Math.round(dist),
+    borderKm: Math.round(border),
+    neighbor,
     proximity: prox,
     color: heatColor(prox, isTarget),
     isTarget,
   }
 }
-
-export { distanceKm }

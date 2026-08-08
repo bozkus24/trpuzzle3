@@ -107,3 +107,90 @@ export function distanceKm(a, b) {
 
 // Türkiye içindeki en uzak iki il arası mesafeye yakın referans (Edirne <-> Hakkari ~1600km)
 export const MAX_DISTANCE_KM = 1650
+
+/* ------------------------------------------------------------------ *
+ *  EN YAKIN SINIR MESAFESİ (border-to-border)
+ *  İki ilin sınırları arasındaki en kısa mesafe (km).
+ *  Komşu (sınırdaş) illerde ~0 km çıkar.
+ * ------------------------------------------------------------------ */
+
+// Türkiye için yerel düzlem yaklaşımı (küçük ölçekte yeterince doğru)
+const LAT_REF = 39
+const KX = 111.32 * Math.cos((LAT_REF * Math.PI) / 180) // km / derece boylam
+const KY = 110.574 // km / derece enlem
+
+// Polygon / MultiPolygon fark etmeksizin poligon listesine normalize et
+function polygonsOf(geometry) {
+  return geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates
+}
+
+// Her il için sınır halkalarını düzlem km koordinatına çevir (bir kez)
+function buildPlanar(feature) {
+  const rings = []
+  for (const poly of polygonsOf(feature.geometry)) {
+    for (const ring of poly) {
+      const pts = ring.map(([lon, lat]) => [lon * KX, lat * KY])
+      if (pts.length >= 2) rings.push(pts)
+    }
+  }
+  return rings
+}
+for (const p of provinces) p._planar = buildPlanar(p.feature)
+
+// Nokta -> doğru parçası mesafesi (düzlem)
+function pointSeg(px, py, ax, ay, bx, by) {
+  const dx = bx - ax
+  const dy = by - ay
+  const len2 = dx * dx + dy * dy
+  let t = len2 ? ((px - ax) * dx + (py - ay) * dy) / len2 : 0
+  t = t < 0 ? 0 : t > 1 ? 1 : t
+  const cx = ax + t * dx
+  const cy = ay + t * dy
+  return Math.hypot(px - cx, py - cy)
+}
+
+// Bir nokta kümesi ile bir halka kümesinin kenarları arası min mesafe
+function minPointsToRings(pts, rings, best) {
+  for (let i = 0; i < pts.length; i++) {
+    const px = pts[i][0]
+    const py = pts[i][1]
+    for (const ring of rings) {
+      for (let j = 0; j < ring.length - 1; j++) {
+        const a = ring[j]
+        const b = ring[j + 1]
+        const d = pointSeg(px, py, a[0], a[1], b[0], b[1])
+        if (d < best) best = d
+        if (best === 0) return 0
+      }
+    }
+  }
+  return best
+}
+
+const _borderCache = new Map()
+
+/** İki ilin sınırları arası en kısa mesafe (km). Komşuysa ~0. */
+export function borderDistanceKm(a, b) {
+  if (a.name === b.name) return 0
+  const ck = a.name < b.name ? a.name + '|' + b.name : b.name + '|' + a.name
+  const hit = _borderCache.get(ck)
+  if (hit !== undefined) return hit
+  const ptsA = a._planar.flat()
+  const ptsB = b._planar.flat()
+  let best = minPointsToRings(ptsA, b._planar, Infinity)
+  best = minPointsToRings(ptsB, a._planar, best)
+  _borderCache.set(ck, best)
+  return best
+}
+
+// Sınırdaş sayılma eşiği (km) — ortak sınır koordinatları çakıştığından ~0 çıkar
+export const NEIGHBOR_EPS_KM = 3
+
+/** İki il sınırdaş (komşu) mı? */
+export function areNeighbors(a, b) {
+  if (a.name === b.name) return false
+  return borderDistanceKm(a, b) <= NEIGHBOR_EPS_KM
+}
+
+// En uzak iki ilin sınır mesafesi (Edirne <-> Hakkari ~1481km) — palet kalibrasyonu
+export const MAX_BORDER_KM = 1481

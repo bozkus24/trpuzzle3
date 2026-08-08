@@ -95,9 +95,9 @@ export default function App() {
     return m
   }, [evaluations])
 
-  // En yakından uzağa sıralı liste
+  // En yakından uzağa sıralı liste (sınır mesafesine göre)
   const sorted = useMemo(
-    () => [...evaluations].sort((a, b) => a.distanceKm - b.distanceKm),
+    () => [...evaluations].sort((a, b) => a.borderKm - b.borderKm),
     [evaluations]
   )
 
@@ -181,7 +181,12 @@ export default function App() {
 
       {closest && !finished && (
         <div className="status">
-          En yakın: <b>{closest.province.name}</b> — {closest.distanceKm} km{' '}
+          En yakın sınır: <b>{closest.province.name}</b>
+          {closest.neighbor ? (
+            <span className="neigh"> — sınırdaş · 0 km</span>
+          ) : (
+            <> — {closest.borderKm} km</>
+          )}{' '}
           <Arrow deg={bearing(closest.province, target)} hidden={closest.isTarget} />
         </div>
       )}
@@ -215,10 +220,15 @@ export default function App() {
 
       <ul className="guess-list">
         {sorted.map((e) => (
-          <li key={e.province.name} className={e.isTarget ? 'hit' : ''}>
+          <li key={e.province.name} className={e.isTarget ? 'hit' : e.neighbor ? 'neighbor' : ''}>
             <span className="swatch" style={{ background: e.color }} />
-            <span className="pname">{e.province.name}</span>
-            <span className="dist">{e.isTarget ? 'Doğru!' : `${e.distanceKm} km`}</span>
+            <span className="pname">
+              {e.province.name}
+              {e.neighbor && <span className="tag">sınırdaş</span>}
+            </span>
+            <span className="dist">
+              {e.isTarget ? 'Doğru!' : e.neighbor ? '0 km' : `${e.borderKm} km`}
+            </span>
             {!e.isTarget && <Arrow deg={bearing(e.province, target)} />}
             <span className="prox">{Math.round(e.proximity * 100)}%</span>
           </li>

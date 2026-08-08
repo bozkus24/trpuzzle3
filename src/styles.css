@@ -87,7 +87,7 @@ body {
 }
 
 .map-wrap {
-  background: linear-gradient(180deg, #a6cfe0 0%, var(--map-sea) 100%);
+  background: linear-gradient(180deg, #3f83c4 0%, #2f6fb2 55%, #285f9c 100%);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 8px;

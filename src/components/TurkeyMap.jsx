@@ -1,51 +1,46 @@
 import { useMemo } from 'react'
-import { geoMercator, geoPath } from 'd3-geo'
+import { geoPath, geoTransform } from 'd3-geo'
 import { geo } from '../lib/provinces'
 import { TARGET_COLOR } from '../lib/game'
+import { SAT, SAT_BOUNDS } from '../data/satellite'
 
-const WIDTH = 1000
+const { west, east, north, south } = SAT_BOUNDS
 const HEIGHT = 440
-const DEPTH = 4 // 3B kabarma yüksekliği (px) — referanstaki gibi hafif
+// Doğal en-boy: boylamı orta enlemin kosinüsüyle sıkıştır (Mercator hissi)
+const latMid = ((north + south) / 2) * (Math.PI / 180)
+const WIDTH = Math.round(
+  (HEIGHT * (east - west) * Math.cos(latMid)) / (north - south)
+)
+const DEPTH = 4 // 3B kabarma yüksekliği (px)
 
-// "rgb(r,g,b)" veya "#rrggbb" -> [r,g,b]
-function parseColor(c) {
-  if (c[0] === '#') {
-    return [
-      parseInt(c.slice(1, 3), 16),
-      parseInt(c.slice(3, 5), 16),
-      parseInt(c.slice(5, 7), 16),
-    ]
-  }
+// lon/lat -> uydu görselinin piksel kutusuyla birebir aynı doğrusal eşleme
+const projection = geoTransform({
+  point(lon, lat) {
+    const x = ((lon - west) / (east - west)) * WIDTH
+    const y = ((north - lat) / (north - south)) * HEIGHT
+    this.stream.point(x, y)
+  },
+})
+const pathGen = geoPath(projection)
+
+function darken(c, f) {
   const m = c.match(/\d+/g)
-  return m ? m.slice(0, 3).map(Number) : [200, 200, 200]
-}
-
-// Yan duvar için koyulaştırılmış renk
-function darken(c, f = 0.55) {
-  const [r, g, b] = parseColor(c)
+  const [r, g, b] = m ? m.slice(0, 3).map(Number) : [20, 20, 20]
   return `rgb(${Math.round(r * f)}, ${Math.round(g * f)}, ${Math.round(b * f)})`
 }
 
 /**
- * Türkiye il haritası. `colors` = { ilAdı: renk } eşlemesi.
- * İç sınır çizilmez; yalnızca tahmin edilen iller boyanır ve
- * yerden yükselmiş gibi 3B (ekstrüzyon + gölge) görünür.
+ * Gerçekçi uydu zeminli Türkiye haritası.
+ * Uydu görseli il siluetine kırpılır (kıyı keskin), üstüne 3B boyalı iller gelir.
  */
-export default function TurkeyMap({ colors = {}, target = null, revealed = false, onPick }) {
+export default function TurkeyMap({ colors = {}, target = null, revealed = false }) {
   const { paths, cy } = useMemo(() => {
-    const projection = geoMercator().fitSize([WIDTH, HEIGHT], geo)
-    const pathGen = geoPath(projection)
-    const paths = geo.features.map((f) => ({
-      name: f.properties.name,
-      d: pathGen(f),
-    }))
-    // Painter's algorithm için her ilin ekran-y merkezi
+    const paths = geo.features.map((f) => ({ name: f.properties.name, d: pathGen(f) }))
     const cy = {}
     for (const f of geo.features) cy[f.properties.name] = pathGen.centroid(f)[1]
     return { paths, cy }
   }, [])
 
-  // Yükseltilecek (boyalı) iller — kuzeyden güneye sırala ki 3B üst üste doğru binsin
   const raised = useMemo(() => {
     const nameSet = new Set(
       paths
@@ -57,12 +52,7 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
       .map((p) => {
         const isTarget = revealed && target && p.name === target.name
         const top = isTarget ? TARGET_COLOR : colors[p.name]
-        return {
-          ...p,
-          top,
-          side: '#141414', // yan duvar — siyah (referans gibi)
-          outline: '#000000', // kalın siyah sınır
-        }
+        return { ...p, top, side: darken(top, 0.45), outline: '#000000' }
       })
     return list.sort((a, b) => cy[a.name] - cy[b.name])
   }, [paths, colors, target, revealed, cy])
@@ -73,36 +63,37 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
         viewBox={`0 ${-DEPTH} ${WIDTH} ${HEIGHT + DEPTH + 14}`}
         className="tr-map"
         role="img"
-        aria-label="Türkiye il haritası"
+        aria-label="Türkiye uydu haritası"
       >
         <defs>
-          <filter id="lift" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="1" dy="3" stdDeviation="2" floodColor="#000000" floodOpacity="0.5" />
+          <clipPath id="tr-land">
+            {paths.map((p) => (
+              <path key={p.name} d={p.d} />
+            ))}
+          </clipPath>
+          <filter id="coast" x="-8%" y="-8%" width="116%" height="130%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#08243a" floodOpacity="0.55" />
           </filter>
-          <filter id="land" x="-10%" y="-10%" width="120%" height="130%">
-            <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#5b7280" floodOpacity="0.35" />
+          <filter id="lift" x="-20%" y="-20%" width="140%" height="150%">
+            <feDropShadow dx="1" dy="3" stdDeviation="2" floodColor="#000000" floodOpacity="0.5" />
           </filter>
         </defs>
 
-        {/* Zemin: tüm ülke tek parça, iç sınır yok */}
-        <g className="base" filter="url(#land)">
-          {paths.map((p) => (
-            <path
-              key={p.name}
-              d={p.d}
-              className="province"
-              fill="var(--map-empty)"
-              onClick={onPick ? () => onPick(p.name) : undefined}
-              style={onPick ? { cursor: 'pointer' } : undefined}
-            />
-          ))}
+        {/* Gerçek uydu zemini — Türkiye siluetine kırpılı, hafif kıyı gölgesi */}
+        <g filter="url(#coast)">
+          <image
+            href={SAT}
+            x="0"
+            y="0"
+            width={WIDTH}
+            height={HEIGHT}
+            preserveAspectRatio="none"
+            clipPath="url(#tr-land)"
+          />
         </g>
 
-        {/* Yükseltilmiş katman: boyalı iller 3B kabarık.
-            İKİ GEÇİŞ: önce TÜM yan duvarlar, sonra TÜM üst yüzeyler —
-            böylece hiçbir ilin üstü komşusunun duvarıyla örtülmez, hepsi aynı seviyede. */}
+        {/* Yükseltilmiş katman: boyalı iller 3B kabarık (iki geçiş) */}
         <g className="raised" filter="url(#lift)">
-          {/* 1. geçiş: yan duvarlar */}
           {raised.map((p) => (
             <g key={'s-' + p.name}>
               {Array.from({ length: DEPTH }).map((_, i) => (
@@ -110,7 +101,6 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
               ))}
             </g>
           ))}
-          {/* 2. geçiş: üst yüzeyler — hepsi aynı yükseklikte, koyu ince sınır çizgisiyle */}
           {raised.map((p) => (
             <path
               key={'t-' + p.name}

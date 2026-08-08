@@ -111,12 +111,13 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
           ))}
         </g>
 
-        {/* Yükseltilmiş katman: boyalı iller 3B kabarık (iki geçiş) */}
+        {/* Yükseltilmiş katman: boyalı iller 3B (iki geçiş). Üst yüz gerçek
+            konumunda (kıyıya oturur), derinlik AŞAĞIYA doğru (alttan görünür). */}
         <g className="raised" filter="url(#lift)">
           {raised.map((p) => (
             <g key={'s-' + p.name}>
               {Array.from({ length: DEPTH }).map((_, i) => (
-                <path key={i} d={p.d} fill={p.side} transform={`translate(0, ${-i})`} />
+                <path key={i} d={p.d} fill={p.side} transform={`translate(0, ${DEPTH - i})`} />
               ))}
             </g>
           ))}
@@ -125,7 +126,6 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
               key={'t-' + p.name}
               d={p.d}
               fill={p.top}
-              transform={`translate(0, ${-DEPTH})`}
               stroke={p.outline}
               strokeWidth={1.8}
               strokeLinejoin="round"

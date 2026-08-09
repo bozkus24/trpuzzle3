@@ -12,6 +12,7 @@ import {
   heatColor,
 } from './lib/game'
 import { loadStats, recordDailyWin } from './lib/stats'
+import logo from './logo.png'
 
 const DAILY_STORE = (key) => `iller-globle:daily:${key}`
 
@@ -169,7 +170,13 @@ export default function App() {
   const guessedNames = useMemo(() => new Set(guesses.map((g) => g.name)), [guesses])
 
   return (
-    <div className="app">
+    <>
+      <div className="topbar">
+        <div className="topbar-inner">
+          <img className="logo" src={logo} alt="İller Globle logo" />
+        </div>
+      </div>
+      <div className="app">
       <header className="header">
         <h1>İller Globle</h1>
         <p className="tagline">Gizli ili tahmin et — her tahmin seni ısıtır ya da soğutur.</p>
@@ -258,6 +265,7 @@ export default function App() {
           shareLabel={copied ? 'Kopyalandı' : 'Paylaş'}
         />
       )}
-    </div>
+      </div>
+    </>
   )
 }

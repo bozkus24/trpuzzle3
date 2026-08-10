@@ -197,7 +197,7 @@ body {
   flex: 1;
   padding: 13px 14px;
   font-size: 1rem;
-  border-radius: 10px;
+  border-radius: 6px;
   border: 1px solid var(--border);
   background: var(--panel);
   color: var(--text);

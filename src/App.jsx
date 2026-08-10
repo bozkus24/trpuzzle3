@@ -199,7 +199,7 @@ export default function App() {
       <div className="topbar">
         <div className="topbar-inner">
           <img className="logo" src={logo} alt="Şehirle logo" />
-          <span className="brand">Şehirle</span>
+          <span className="brand">ŞEHİRLE</span>
           <button
             className="stats-btn"
             onClick={() => setShowStats(true)}

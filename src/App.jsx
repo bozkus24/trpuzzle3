@@ -35,6 +35,21 @@ export default function App() {
   const [stats, setStats] = useState(() => loadStats())
   const [showStats, setShowStats] = useState(false)
 
+  // Tema (açık / koyu)
+  const [theme, setTheme] = useState(() => {
+    try {
+      return localStorage.getItem('iller-globle:theme') || 'light'
+    } catch {
+      return 'light'
+    }
+  })
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    try {
+      localStorage.setItem('iller-globle:theme', theme)
+    } catch {}
+  }, [theme])
+
   // Günün ili ilerlemesini yükle
   useEffect(() => {
     if (mode !== 'daily') return
@@ -200,18 +215,51 @@ export default function App() {
         <div className="topbar-inner">
           <img className="logo" src={logo} alt="Şehirle logo" />
           <span className="brand">Şehirle</span>
-          <button
-            className="stats-btn"
-            onClick={() => setShowStats(true)}
-            aria-label="İstatistikler"
-            title="İstatistikler"
-          >
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3" y="12" width="4" height="8" rx="1" fill="currentColor" />
-              <rect x="10" y="7" width="4" height="13" rx="1" fill="currentColor" />
-              <rect x="17" y="3" width="4" height="17" rx="1" fill="currentColor" />
-            </svg>
-          </button>
+          <div className="topbar-actions">
+            <button
+              className="stats-btn"
+              onClick={() => setShowStats(true)}
+              aria-label="İstatistikler"
+              title="İstatistikler"
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="3" y="12" width="4" height="8" rx="1" fill="currentColor" />
+                <rect x="10" y="7" width="4" height="13" rx="1" fill="currentColor" />
+                <rect x="17" y="3" width="4" height="17" rx="1" fill="currentColor" />
+              </svg>
+            </button>
+            <button
+              className="theme-btn"
+              onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+              aria-label={theme === 'dark' ? 'Açık moda geç' : 'Koyu moda geç'}
+              title={theme === 'dark' ? 'Açık mod' : 'Koyu mod'}
+            >
+              {theme === 'dark' ? (
+                // güneş
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="12" r="4.2" fill="currentColor" />
+                  <g stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <line x1="12" y1="2.5" x2="12" y2="5" />
+                    <line x1="12" y1="19" x2="12" y2="21.5" />
+                    <line x1="2.5" y1="12" x2="5" y2="12" />
+                    <line x1="19" y1="12" x2="21.5" y2="12" />
+                    <line x1="5.2" y1="5.2" x2="7" y2="7" />
+                    <line x1="17" y1="17" x2="18.8" y2="18.8" />
+                    <line x1="18.8" y1="5.2" x2="17" y2="7" />
+                    <line x1="7" y1="17" x2="5.2" y2="18.8" />
+                  </g>
+                </svg>
+              ) : (
+                // ay
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"
+                    fill="currentColor"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
       </div>
       <div className="app">

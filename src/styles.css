@@ -69,11 +69,18 @@ body {
   color: var(--text);
 }
 
-.topbar .stats-btn {
+.topbar-actions {
   position: absolute;
-  right: 16px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.topbar .stats-btn,
+.topbar .theme-btn {
   display: grid;
   place-items: center;
   width: 40px;
@@ -86,11 +93,13 @@ body {
   border-radius: 8px;
 }
 
-.topbar .stats-btn:hover {
+.topbar .stats-btn:hover,
+.topbar .theme-btn:hover {
   background: rgba(16, 22, 29, 0.08);
 }
 
-.topbar .stats-btn svg {
+.topbar .stats-btn svg,
+.topbar .theme-btn svg {
   width: 24px;
   height: 24px;
   display: block;
@@ -799,4 +808,61 @@ body {
   .modal-title {
     font-size: 1.6rem;
   }
+}
+
+/* ================= KOYU MOD ================= */
+:root[data-theme='dark'] {
+  --bg-top: #1c1740;
+  --bg-bottom: #100c26;
+  --bg-soft: #1a2233;
+  --panel: #1e2637;
+  --text: #e9eef4;
+  --muted: #9fb0c0;
+  --accent: #3b62f0;
+  --accent-2: #35c56a;
+  --border: #333f52;
+  --map-empty: #3a4759;
+  color-scheme: dark;
+}
+
+:root[data-theme='dark'] .topbar .stats-btn:hover,
+:root[data-theme='dark'] .topbar .theme-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Geri bildirim renkleri koyu zeminde biraz parlak */
+:root[data-theme='dark'] .feedback.hot {
+  color: #ff6a4d;
+}
+:root[data-theme='dark'] .feedback.cold {
+  color: #5b8bff;
+}
+
+/* Modal koyu */
+:root[data-theme='dark'] .modal-overlay {
+  background: rgba(0, 0, 0, 0.55);
+}
+:root[data-theme='dark'] .modal-card {
+  background: #1e2637;
+  color: var(--text);
+}
+:root[data-theme='dark'] .modal-x {
+  color: var(--muted);
+}
+:root[data-theme='dark'] .modal-title,
+:root[data-theme='dark'] .modal-sub b,
+:root[data-theme='dark'] .stat-num {
+  color: var(--text);
+}
+:root[data-theme='dark'] .modal-sub,
+:root[data-theme='dark'] .stat-cap,
+:root[data-theme='dark'] .dist-title,
+:root[data-theme='dark'] .dist-label {
+  color: var(--muted);
+}
+:root[data-theme='dark'] .stat-box {
+  background: #262f42;
+}
+:root[data-theme='dark'] .dist-bar {
+  background: #3a4759;
 }

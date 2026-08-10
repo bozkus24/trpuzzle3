@@ -264,13 +264,13 @@ export default function App() {
             <button className="linkbtn" onClick={() => setByGuessOrder((v) => !v)}>
               {byGuessOrder ? 'Yakınlığa göre sırala' : 'Tahmin sırasına göre sırala'}
             </button>
-
-            {!finished && (
-              <button className="linkbtn giveup" onClick={giveUp}>
-                Pes et
-              </button>
-            )}
           </div>
+
+          {!finished && (
+            <button className="reveal-btn" onClick={giveUp}>
+              Cevabı göster
+            </button>
+          )}
         </section>
       )}
 

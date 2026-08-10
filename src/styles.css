@@ -533,6 +533,27 @@ body {
   padding: 2px;
 }
 
+/* En yakın sınırın altındaki "Cevabı göster" butonu */
+.reveal-btn {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 11px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.reveal-btn:hover {
+  color: var(--text);
+  border-color: var(--muted);
+}
+
 .metric {
   display: flex;
   align-items: center;

@@ -6,7 +6,7 @@
   --panel: #ffffff;
   --text: #10161d;
   --muted: #435160;
-  --accent: #4172b0; /* buton mavisi */
+  --accent: #2f6f73; /* buton rengi (teal) */
   --accent-2: #1f9d4d; /* doğru = yeşil */
   --border: #c4d2de;
   --map-empty: #c2cdd6;
@@ -540,18 +540,17 @@ body {
   margin-top: 12px;
   padding: 11px 16px;
   border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--panel);
-  color: var(--muted);
+  border: none;
+  background: var(--accent);
+  color: #fff;
   font-family: inherit;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.95rem;
   cursor: pointer;
 }
 
 .reveal-btn:hover {
-  color: var(--text);
-  border-color: var(--muted);
+  filter: brightness(0.92);
 }
 
 .metric {

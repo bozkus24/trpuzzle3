@@ -169,6 +169,27 @@ export default function App() {
 
   const guessedNames = useMemo(() => new Set(guesses.map((g) => g.name)), [guesses])
 
+  // Son tahmine göre "daha sıcak / daha soğuk" geri bildirimi (butonun altında)
+  const feedback = useMemo(() => {
+    if (!evals.length) return { text: 'Bir il adı yaz ve tahmine başla.', tone: 'hint' }
+    const last = evals[evals.length - 1]
+    if (last.isTarget) return { text: `${last.province.name} — doğru!`, tone: 'hit' }
+    const word = (p) =>
+      p >= 0.8 ? 'çok sıcak' : p >= 0.6 ? 'sıcak' : p >= 0.4 ? 'ılık' : p >= 0.2 ? 'soğuk' : 'çok soğuk'
+    if (evals.length === 1) {
+      return {
+        text: `${last.province.name}: ${word(last.prox)}`,
+        tone: last.prox >= 0.5 ? 'hot' : 'cold',
+      }
+    }
+    const prev = evals[evals.length - 2]
+    if (last.prox > prev.prox + 0.0005)
+      return { text: `${last.province.name} daha sıcak`, tone: 'hot' }
+    if (last.prox < prev.prox - 0.0005)
+      return { text: `${last.province.name} daha soğuk`, tone: 'cold' }
+    return { text: `${last.province.name} aynı sıcaklıkta`, tone: 'hint' }
+  }, [evals])
+
   return (
     <>
       <div className="topbar">
@@ -178,10 +199,6 @@ export default function App() {
         </div>
       </div>
       <div className="app">
-      <header className="header">
-        <p className="tagline">Gizli ili tahmin et — her tahmin seni ısıtır ya da soğutur.</p>
-      </header>
-
       <div className="modes">
         <button
           className={mode === 'daily' ? 'active' : ''}
@@ -197,30 +214,34 @@ export default function App() {
         </button>
       </div>
 
+      {/* Tahmin kutusu haritanın ÜSTÜNDE; geri bildirim butonun altında */}
+      {!finished ? (
+        <>
+          <GuessInput onGuess={handleGuess} disabled={finished} guessedNames={guessedNames} />
+          <div className={'feedback ' + feedback.tone}>{feedback.text}</div>
+        </>
+      ) : (
+        !showStats && (
+          <div className="finished-bar">
+            <span>
+              {won ? (
+                <>
+                  <b>{target.name}</b> - {guesses.length} tahmin
+                </>
+              ) : (
+                <>
+                  Cevap: <b>{target.name}</b>
+                </>
+              )}
+            </span>
+            <button className="linkbtn" onClick={() => setShowStats(true)}>
+              İstatistikler
+            </button>
+          </div>
+        )
+      )}
+
       <TurkeyMap colors={colors} target={target} revealed={finished} />
-
-      {!finished && (
-        <GuessInput onGuess={handleGuess} disabled={finished} guessedNames={guessedNames} />
-      )}
-
-      {finished && !showStats && (
-        <div className="finished-bar">
-          <span>
-            {won ? (
-              <>
-                <b>{target.name}</b> - {guesses.length} tahmin
-              </>
-            ) : (
-              <>
-                Cevap: <b>{target.name}</b>
-              </>
-            )}
-          </span>
-          <button className="linkbtn" onClick={() => setShowStats(true)}>
-            İstatistikler
-          </button>
-        </div>
-      )}
 
       {guesses.length > 0 && (
         <section className="panel">

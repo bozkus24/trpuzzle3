@@ -192,6 +192,32 @@ body {
   padding-left: 2px;
 }
 
+/* Tahmin butonunun altındaki sıcak/soğuk geri bildirimi */
+.feedback {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 2px 0 14px;
+  min-height: 1.4em;
+}
+
+.feedback.hot {
+  color: #d1442b;
+}
+
+.feedback.cold {
+  color: #2166d6;
+}
+
+.feedback.hit {
+  color: var(--accent-2);
+}
+
+.feedback.hint {
+  color: var(--muted);
+  font-weight: 600;
+}
+
 .guess-btn {
   padding: 0 18px;
   border-radius: 10px;

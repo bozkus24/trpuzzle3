@@ -11,7 +11,7 @@ import {
   proximity,
   heatColor,
 } from './lib/game'
-import { loadStats, recordDailyWin } from './lib/stats'
+import { loadStats, recordDailyWin, recordDailyLoss } from './lib/stats'
 import logo from './logo.png'
 
 const DAILY_STORE = (key) => `iller-globle:daily:${key}`
@@ -47,6 +47,7 @@ export default function App() {
         setWon(!!data.won)
         setGaveUp(!!data.gaveUp)
         if (data.won) setStats(recordDailyWin(dateKey, gs.length))
+        else if (data.gaveUp) setStats(recordDailyLoss(dateKey))
         return
       }
     } catch {}
@@ -131,7 +132,10 @@ export default function App() {
 
   function giveUp() {
     setGaveUp(true)
-    if (mode === 'daily') persistDaily(guesses, false, true)
+    if (mode === 'daily') {
+      persistDaily(guesses, false, true)
+      setStats(recordDailyLoss(dateKey))
+    }
     setShowStats(true)
   }
 

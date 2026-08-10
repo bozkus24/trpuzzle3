@@ -6,7 +6,7 @@
   --panel: #ffffff;
   --text: #10161d;
   --muted: #435160;
-  --accent: #2d51e0; /* Globle mavisi (butonlar/linkler) */
+  --accent: #4172b0; /* buton mavisi */
   --accent-2: #1f9d4d; /* doğru = yeşil */
   --border: #c4d2de;
   --map-empty: #c2cdd6;
@@ -150,8 +150,8 @@ body {
 }
 
 .modes button.active {
-  background: #374151; /* koyu gri */
-  border-color: #374151;
+  background: var(--accent);
+  border-color: var(--accent);
   color: #fff;
 }
 
@@ -249,7 +249,7 @@ body {
   padding: 0 18px;
   border-radius: 10px;
   border: none;
-  background: #374151; /* koyu gri */
+  background: var(--accent);
   color: #fff;
   font-weight: 700;
   font-size: 0.95rem;

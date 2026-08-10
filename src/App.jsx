@@ -52,6 +52,8 @@ export default function App() {
       return true
     }
   })
+  // ? ikonundan elle açıldı mı (o zaman "bir daha gösterme" gösterilmez)
+  const [howToManual, setHowToManual] = useState(false)
   function toggleDontShowHowTo() {
     setDontShowHowTo((v) => {
       const next = !v
@@ -230,7 +232,10 @@ export default function App() {
           <div className="topbar-actions">
             <button
               className="icon-btn"
-              onClick={() => setShowHowTo(true)}
+              onClick={() => {
+                setHowToManual(true)
+                setShowHowTo(true)
+              }}
               aria-label="Nasıl Oynanır"
               title="Nasıl Oynanır"
             >
@@ -338,9 +343,13 @@ export default function App() {
 
       {showHowTo && (
         <HowToModal
+          showDontShow={!howToManual}
           dontShow={dontShowHowTo}
           onToggleDontShow={toggleDontShowHowTo}
-          onClose={() => setShowHowTo(false)}
+          onClose={() => {
+            setShowHowTo(false)
+            setHowToManual(false)
+          }}
         />
       )}
       </div>

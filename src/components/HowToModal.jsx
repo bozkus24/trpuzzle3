@@ -2,7 +2,7 @@
  * "Nasıl Oynanır" popup'ı. İlk açılışta otomatik gösterilir;
  * "Bir daha gösterme" ile bir daha açılmaz (localStorage).
  */
-export default function HowToModal({ onClose, dontShow, onToggleDontShow }) {
+export default function HowToModal({ onClose, dontShow, onToggleDontShow, showDontShow }) {
   return (
     <div className="modal-overlay" onMouseDown={onClose}>
       <div
@@ -50,10 +50,12 @@ export default function HowToModal({ onClose, dontShow, onToggleDontShow }) {
           </p>
         </div>
 
-        <label className="dontshow">
-          <input type="checkbox" checked={dontShow} onChange={onToggleDontShow} />
-          Bir daha gösterme
-        </label>
+        {showDontShow && (
+          <label className="dontshow">
+            <input type="checkbox" checked={dontShow} onChange={onToggleDontShow} />
+            Bir daha gösterme
+          </label>
+        )}
 
         <div className="modal-actions">
           <button className="modal-btn" onClick={onClose}>

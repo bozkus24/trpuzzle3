@@ -139,7 +139,7 @@ body {
   flex: 1;
   max-width: 220px;
   padding: 10px 14px;
-  border-radius: 10px;
+  border-radius: 6px;
   border: 1px solid var(--border);
   background: var(--panel);
   color: var(--muted);
@@ -247,7 +247,7 @@ body {
 
 .guess-btn {
   padding: 0 18px;
-  border-radius: 10px;
+  border-radius: 6px;
   border: none;
   background: var(--accent);
   color: #fff;
@@ -539,7 +539,7 @@ body {
   width: 100%;
   margin-top: 12px;
   padding: 11px 16px;
-  border-radius: 10px;
+  border-radius: 6px;
   border: none;
   background: var(--accent);
   color: #fff;
@@ -796,7 +796,7 @@ body {
   flex: 1;
   max-width: 165px;
   padding: 13px 16px;
-  border-radius: 10px;
+  border-radius: 6px;
   border: none;
   background: var(--accent);
   color: #fff;

@@ -615,17 +615,11 @@ body {
 /* ---- Doğru cevap / gizemli şehir bandı (modal kapalıyken) ---- */
 .reveal-banner {
   text-align: center;
-  font-weight: 800;
-  font-size: 1.9rem;
-  line-height: 1.15;
+  font-weight: 700;
+  font-size: 1.2rem;
+  line-height: 1.3;
   color: #3f8a2e; /* doğru il yeşili */
-  margin: 4px 0 14px;
-}
-
-@media (max-width: 480px) {
-  .reveal-banner {
-    font-size: 1.5rem;
-  }
+  margin: 2px 0 14px;
 }
 
 /* ---- İstatistik popup ---- */

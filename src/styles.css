@@ -69,11 +69,17 @@ body {
   color: var(--text);
 }
 
-.topbar .stats-btn {
+.topbar-actions {
   position: absolute;
-  right: 16px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.topbar .icon-btn {
   display: grid;
   place-items: center;
   width: 40px;
@@ -86,11 +92,11 @@ body {
   border-radius: 8px;
 }
 
-.topbar .stats-btn:hover {
+.topbar .icon-btn:hover {
   background: rgba(16, 22, 29, 0.08);
 }
 
-.topbar .stats-btn svg {
+.topbar .icon-btn svg {
   width: 24px;
   height: 24px;
   display: block;
@@ -783,6 +789,63 @@ body {
 
 .dist-count {
   font-variant-numeric: tabular-nums;
+}
+
+/* Nasıl Oynanır içeriği */
+.howto {
+  color: #24303f;
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+
+.howto p {
+  margin: 0 0 12px;
+}
+
+.howto b {
+  color: #0b1120;
+}
+
+.howto-legend {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 14px;
+}
+
+.howto-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+}
+
+.howto-legend .sw {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  flex: none;
+}
+
+.dontshow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 0.92rem;
+  color: #334155;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dontshow input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
 }
 
 .modal-actions {

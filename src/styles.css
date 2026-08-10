@@ -612,17 +612,20 @@ body {
   margin-left: auto;
 }
 
-/* ---- Bitiş çubuğu (modal kapalıyken) ---- */
-.finished-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
-  border-radius: 12px;
-  background: var(--panel);
-  border: 1px solid var(--border);
+/* ---- Doğru cevap / gizemli şehir bandı (modal kapalıyken) ---- */
+.reveal-banner {
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.9rem;
+  line-height: 1.15;
+  color: #3f8a2e; /* doğru il yeşili */
+  margin: 4px 0 14px;
+}
+
+@media (max-width: 480px) {
+  .reveal-banner {
+    font-size: 1.5rem;
+  }
 }
 
 /* ---- İstatistik popup ---- */

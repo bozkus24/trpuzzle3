@@ -238,19 +238,7 @@ export default function App() {
         </>
       ) : (
         !showStats && (
-          <div className="finished-bar">
-            <span>
-              {won ? (
-                <>
-                  <b>{target.name}</b> - {guesses.length} tahmin
-                </>
-              ) : (
-                <>
-                  Cevap: <b>{target.name}</b>
-                </>
-              )}
-            </span>
-          </div>
+          <div className="reveal-banner">Gizemli Şehir {target.name}!</div>
         )
       )}
 

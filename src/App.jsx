@@ -200,6 +200,18 @@ export default function App() {
         <div className="topbar-inner">
           <img className="logo" src={logo} alt="Şehirle logo" />
           <span className="brand">Şehirle</span>
+          <button
+            className="stats-btn"
+            onClick={() => setShowStats(true)}
+            aria-label="İstatistikler"
+            title="İstatistikler"
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="12" width="4" height="8" rx="1" fill="currentColor" />
+              <rect x="10" y="7" width="4" height="13" rx="1" fill="currentColor" />
+              <rect x="17" y="3" width="4" height="17" rx="1" fill="currentColor" />
+            </svg>
+          </button>
         </div>
       </div>
       <div className="app">
@@ -238,9 +250,6 @@ export default function App() {
                 </>
               )}
             </span>
-            <button className="linkbtn" onClick={() => setShowStats(true)}>
-              İstatistikler
-            </button>
           </div>
         )
       )}
@@ -277,11 +286,12 @@ export default function App() {
         </section>
       )}
 
-      {showStats && finished && (
+      {showStats && (
         <StatsModal
           stats={stats}
           guessCount={guesses.length}
           won={won}
+          finished={finished}
           answer={target.name}
           mode={mode}
           onClose={() => setShowStats(false)}

@@ -69,6 +69,33 @@ body {
   color: var(--text);
 }
 
+.topbar .stats-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.topbar .stats-btn:hover {
+  background: rgba(16, 22, 29, 0.08);
+}
+
+.topbar .stats-btn svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
 .app {
   max-width: 720px;
   margin: 0 auto;
@@ -123,8 +150,8 @@ body {
 }
 
 .modes button.active {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: #374151; /* koyu gri */
+  border-color: #374151;
   color: #fff;
 }
 

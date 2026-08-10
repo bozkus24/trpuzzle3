@@ -8,6 +8,7 @@ export default function StatsModal({
   stats,
   guessCount,
   won,
+  finished,
   answer,
   mode,
   onClose,
@@ -42,7 +43,7 @@ export default function StatsModal({
 
         <h2 className="modal-title">İstatistikler</h2>
 
-        {!won && (
+        {finished && !won && (
           <p className="modal-sub">
             Doğru cevap: <b>{answer}</b>
           </p>
@@ -74,14 +75,16 @@ export default function StatsModal({
           ))}
         </div>
 
-        <div className="modal-actions">
-          <button className="modal-btn" onClick={onPrimary}>
-            {mode === 'daily' ? 'Pratik' : 'Yeni oyun'}
-          </button>
-          <button className="modal-btn" onClick={onShare}>
-            {shareLabel}
-          </button>
-        </div>
+        {finished && (
+          <div className="modal-actions">
+            <button className="modal-btn" onClick={onPrimary}>
+              {mode === 'daily' ? 'Pratik' : 'Yeni oyun'}
+            </button>
+            <button className="modal-btn" onClick={onShare}>
+              {shareLabel}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -8,7 +8,7 @@ export default function GuessInput({ onGuess, disabled, guessedNames }) {
   function submit() {
     const p = findProvince(value)
     if (!p) {
-      setError('Böyle bir il bulunamadı')
+      setError('Böyle bir şehir bulunamadı')
       return
     }
     if (guessedNames?.has(p.name)) {
@@ -30,7 +30,7 @@ export default function GuessInput({ onGuess, disabled, guessedNames }) {
           autoCapitalize="off"
           autoCorrect="off"
           spellCheck="false"
-          placeholder="İl adını yaz… (örn. Ankara)"
+          placeholder="Şehir adını yaz… (örn. Ankara)"
           value={value}
           disabled={disabled}
           onChange={(e) => {
@@ -40,7 +40,7 @@ export default function GuessInput({ onGuess, disabled, guessedNames }) {
           onKeyDown={(e) => {
             if (e.key === 'Enter') submit()
           }}
-          aria-label="İl tahmini"
+          aria-label="Şehir tahmini"
           className={error ? 'invalid' : ''}
         />
         <button className="guess-btn" onClick={submit} disabled={disabled}>

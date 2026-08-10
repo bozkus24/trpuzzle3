@@ -249,7 +249,7 @@ body {
   padding: 0 18px;
   border-radius: 10px;
   border: none;
-  background: var(--accent);
+  background: #374151; /* koyu gri */
   color: #fff;
   font-weight: 700;
   font-size: 0.95rem;

@@ -159,7 +159,7 @@ export default function App() {
   const [copied, setCopied] = useState(false)
   function share() {
     const n = guesses.length
-    const head = mode === 'daily' ? `İller Globle — ${dateKey}` : `İller Globle — Pratik`
+    const head = mode === 'daily' ? `Şehirle — ${dateKey}` : `Şehirle — Pratik`
     const result = won ? `${n} tahminde buldum.` : `Bulamadım.`
     const text = `${head}\n${result}`
     navigator.clipboard?.writeText(text).then(
@@ -175,7 +175,7 @@ export default function App() {
 
   // Son tahmine göre "daha sıcak / daha soğuk" geri bildirimi (butonun altında)
   const feedback = useMemo(() => {
-    if (!evals.length) return { text: 'Bir il adı yaz ve tahmine başla.', tone: 'hint' }
+    if (!evals.length) return { text: 'Bir şehir adı yaz ve tahmine başla.', tone: 'hint' }
     const last = evals[evals.length - 1]
     if (last.isTarget) return { text: `${last.province.name} — doğru!`, tone: 'hit' }
     const word = (p) =>
@@ -220,7 +220,7 @@ export default function App() {
           className={mode === 'daily' ? 'active' : ''}
           onClick={() => switchMode('daily')}
         >
-          Günün İli
+          Günün Şehri
         </button>
         <button
           className={mode === 'practice' ? 'active' : ''}

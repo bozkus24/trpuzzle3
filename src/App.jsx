@@ -3,6 +3,7 @@ import TurkeyMap from './components/TurkeyMap'
 import GuessInput from './components/GuessInput'
 import StatsModal from './components/StatsModal'
 import HowToModal from './components/HowToModal'
+import SettingsModal from './components/SettingsModal'
 import { findProvince, MAX_BORDER_KM } from './lib/provinces'
 import {
   dailyProvince,
@@ -11,6 +12,7 @@ import {
   evaluateGuess,
   proximity,
   heatColor,
+  targetColorFor,
 } from './lib/game'
 import { loadStats, recordDailyWin, recordDailyLoss } from './lib/stats'
 import logo from './logo.png'
@@ -54,6 +56,26 @@ export default function App() {
   })
   // ? ikonundan elle açıldı mı (o zaman "bir daha gösterme" gösterilmez)
   const [howToManual, setHowToManual] = useState(false)
+
+  // Ayarlar + renk körü modu
+  const CB_KEY = 'iller-globle:colorblind'
+  const [showSettings, setShowSettings] = useState(false)
+  const [colorBlind, setColorBlind] = useState(() => {
+    try {
+      return localStorage.getItem(CB_KEY) === '1'
+    } catch {
+      return false
+    }
+  })
+  function toggleColorBlind() {
+    setColorBlind((v) => {
+      const next = !v
+      try {
+        localStorage.setItem(CB_KEY, next ? '1' : '0')
+      } catch {}
+      return next
+    })
+  }
   function toggleDontShowHowTo() {
     setDontShowHowTo((v) => {
       const next = !v
@@ -127,9 +149,9 @@ export default function App() {
     () =>
       evaluations.map((e) => {
         const prox = proximity(e.borderKm, MAX_BORDER_KM)
-        return { ...e, dist: e.borderKm, prox, color: heatColor(prox, e.isTarget) }
+        return { ...e, dist: e.borderKm, prox, color: heatColor(prox, e.isTarget, colorBlind) }
       }),
-    [evaluations]
+    [evaluations, colorBlind]
   )
 
   // Harita için renk eşlemesi
@@ -263,6 +285,22 @@ export default function App() {
                 <rect x="17" y="3" width="4" height="17" rx="1" fill="currentColor" />
               </svg>
             </button>
+            <button
+              className="icon-btn"
+              onClick={() => setShowSettings(true)}
+              aria-label="Ayarlar"
+              title="Ayarlar"
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="3.2" stroke="currentColor" strokeWidth="2" />
+                <path
+                  d="M12 2.5v2.2M12 19.3v2.2M21.5 12h-2.2M4.7 12H2.5M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6M18.7 18.7l-1.6-1.6M6.9 6.9 5.3 5.3"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
@@ -290,11 +328,18 @@ export default function App() {
         </>
       ) : (
         !showStats && (
-          <div className="reveal-banner">Gizemli Şehir {target.name}!</div>
+          <div className="reveal-banner" style={{ color: targetColorFor(colorBlind) }}>
+            Gizemli Şehir {target.name}!
+          </div>
         )
       )}
 
-      <TurkeyMap colors={colors} target={target} revealed={finished} />
+      <TurkeyMap
+        colors={colors}
+        target={target}
+        revealed={finished}
+        targetColor={targetColorFor(colorBlind)}
+      />
 
       {guesses.length > 0 && (
         <section className="panel">
@@ -350,6 +395,14 @@ export default function App() {
             setShowHowTo(false)
             setHowToManual(false)
           }}
+        />
+      )}
+
+      {showSettings && (
+        <SettingsModal
+          colorBlind={colorBlind}
+          onToggleColorBlind={toggleColorBlind}
+          onClose={() => setShowSettings(false)}
         />
       )}
       </div>

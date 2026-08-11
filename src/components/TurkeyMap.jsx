@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { geoPath, geoTransform } from 'd3-geo'
 import { geo } from '../lib/provinces'
 import { TARGET_COLOR } from '../lib/game'
+// targetColor prop ile renk körü modunda mavi hedef desteklenir
 import { SAT_BOUNDS, SAT_RELIEF } from '../data/satellite'
 import { LAND } from '../data/land'
 
@@ -34,7 +35,12 @@ function darken(c, f) {
  * Gerçekçi uydu zeminli Türkiye haritası.
  * Uydu görseli il siluetine kırpılır (kıyı keskin), üstüne 3B boyalı iller gelir.
  */
-export default function TurkeyMap({ colors = {}, target = null, revealed = false }) {
+export default function TurkeyMap({
+  colors = {},
+  target = null,
+  revealed = false,
+  targetColor = TARGET_COLOR,
+}) {
   const { paths, cy } = useMemo(() => {
     const paths = geo.features.map((f) => ({ name: f.properties.name, d: pathGen(f) }))
     const cy = {}
@@ -58,11 +64,11 @@ export default function TurkeyMap({ colors = {}, target = null, revealed = false
       .filter((p) => nameSet.has(p.name))
       .map((p) => {
         const isTarget = revealed && target && p.name === target.name
-        const top = isTarget ? TARGET_COLOR : colors[p.name]
+        const top = isTarget ? targetColor : colors[p.name]
         return { ...p, top, side: darken(top, 0.45), outline: '#000000' }
       })
     return list.sort((a, b) => cy[a.name] - cy[b.name])
-  }, [paths, colors, target, revealed, cy])
+  }, [paths, colors, target, revealed, targetColor, cy])
 
   return (
     <div className="map-wrap">

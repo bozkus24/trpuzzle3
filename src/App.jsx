@@ -280,9 +280,9 @@ export default function App() {
               title="İstatistikler"
             >
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <rect x="3" y="12" width="4" height="8" rx="1" fill="currentColor" />
-                <rect x="10" y="7" width="4" height="13" rx="1" fill="currentColor" />
-                <rect x="17" y="3" width="4" height="17" rx="1" fill="currentColor" />
+                <rect x="4" y="11" width="4.2" height="9" rx="2.1" fill="currentColor" />
+                <rect x="9.9" y="4" width="4.2" height="16" rx="2.1" fill="currentColor" />
+                <rect x="15.8" y="8" width="4.2" height="12" rx="2.1" fill="currentColor" />
               </svg>
             </button>
             <button

@@ -42,7 +42,7 @@ export default function App() {
   const startBlink = useCallback((name) => {
     setBlinkName(name)
     if (blinkTimer.current) clearTimeout(blinkTimer.current)
-    blinkTimer.current = setTimeout(() => setBlinkName(null), 2000)
+    blinkTimer.current = setTimeout(() => setBlinkName(null), 1600)
   }, [])
 
   // İstatistik popup'ı

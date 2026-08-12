@@ -16,7 +16,6 @@ import {
   targetColorFor,
 } from './lib/game'
 import { loadStats, recordDailyWin, recordDailyLoss } from './lib/stats'
-import logo from './logo.png'
 import logoDark from './logo-dark.png'
 
 const DAILY_STORE = (key) => `iller-globle:daily:${key}`
@@ -271,7 +270,7 @@ export default function App() {
     <>
       <div className="topbar">
         <div className="topbar-inner">
-          <img className="logo" src={dark ? logoDark : logo} alt="Şehirle logo" />
+          <img className="logo" src={logoDark} alt="Şehirle logo" />
           <span className="brand">ŞEHİRLE</span>
           <div className="topbar-actions">
             <button

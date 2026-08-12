@@ -57,7 +57,7 @@ body {
   left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  height: 40px;
+  height: 47px;
   width: auto;
   display: block;
 }
@@ -1024,12 +1024,9 @@ body {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Logo koyu modda ayrı (temiz) görsele geçer; saydam zemin.
-   Yeni görselde kenar boşluğu fazla; amblem açık moddakiyle aynı
-   görünsün diye yükseklik ~47px. */
+/* Logo her iki modda aynı görsel/boyut; koyu modda saydam zemin */
 :root[data-theme='dark'] .topbar .logo {
   background: transparent;
-  height: 47px;
 }
 
 /* Geri bildirim renkleri koyu zeminde biraz parlak */

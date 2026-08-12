@@ -181,6 +181,21 @@ body {
   border-radius: 16px;
 }
 
+/* Son yazılan şehir 2 sn yanıp söner (4 × 0.5 sn) */
+@keyframes provBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.tr-map .prov-blink {
+  animation: provBlink 0.5s ease-in-out 4;
+}
+
 /* İç sınır yok — komşu path'ler arası antialias dikişini
    fill ile aynı renk ince stroke ile kapatıyoruz */
 .province {

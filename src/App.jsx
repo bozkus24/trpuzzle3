@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import TurkeyMap from './components/TurkeyMap'
 import GuessInput from './components/GuessInput'
 import StatsModal from './components/StatsModal'
@@ -35,6 +35,15 @@ export default function App() {
 
   // Görünüm ayarı: sıralama (tahmin sırası mı, yakınlık mı)
   const [byGuessOrder, setByGuessOrder] = useState(false)
+
+  // Son yazılan şehir 2 sn yanıp söner
+  const [blinkName, setBlinkName] = useState(null)
+  const blinkTimer = useRef(null)
+  const startBlink = useCallback((name) => {
+    setBlinkName(name)
+    if (blinkTimer.current) clearTimeout(blinkTimer.current)
+    blinkTimer.current = setTimeout(() => setBlinkName(null), 2000)
+  }, [])
 
   // İstatistik popup'ı
   const [stats, setStats] = useState(() => loadStats())
@@ -149,6 +158,7 @@ export default function App() {
       if (guesses.some((g) => g.name === province.name)) return
       const next = [...guesses, province]
       setGuesses(next)
+      startBlink(province.name)
       const isWin = province.name === target.name
       if (mode === 'daily') persistDaily(next, isWin, false)
       if (isWin) {
@@ -157,7 +167,7 @@ export default function App() {
         setShowStats(true)
       }
     },
-    [finished, guesses, target, mode, persistDaily, dateKey]
+    [finished, guesses, target, mode, persistDaily, dateKey, startBlink]
   )
 
   const evaluations = useMemo(
@@ -386,7 +396,7 @@ export default function App() {
         target={target}
         revealed={finished}
         targetColor={targetColorFor(colorBlind)}
-        last={guesses.length ? guesses[guesses.length - 1].name : null}
+        blink={blinkName}
       />
 
       {guesses.length > 0 && (

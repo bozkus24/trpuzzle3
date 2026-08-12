@@ -386,6 +386,7 @@ export default function App() {
         target={target}
         revealed={finished}
         targetColor={targetColorFor(colorBlind)}
+        last={guesses.length ? guesses[guesses.length - 1].name : null}
       />
 
       {guesses.length > 0 && (

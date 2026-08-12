@@ -40,6 +40,7 @@ export default function TurkeyMap({
   target = null,
   revealed = false,
   targetColor = TARGET_COLOR,
+  last = null,
 }) {
   const { paths, cy } = useMemo(() => {
     const paths = geo.features.map((f) => ({ name: f.properties.name, d: pathGen(f) }))
@@ -133,7 +134,7 @@ export default function TurkeyMap({
               d={p.d}
               fill={p.top}
               stroke={p.outline}
-              strokeWidth={1.8}
+              strokeWidth={p.name === last ? 3 : 1.8}
               strokeLinejoin="round"
             >
               <title>{p.name}</title>

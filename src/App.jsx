@@ -78,6 +78,25 @@ export default function App() {
       return next
     })
   }
+
+  // Karanlık mod
+  const THEME_KEY = 'iller-globle:theme'
+  const [dark, setDark] = useState(() => {
+    try {
+      return localStorage.getItem(THEME_KEY) === 'dark'
+    } catch {
+      return false
+    }
+  })
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+    try {
+      localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light')
+    } catch {}
+  }, [dark])
+  function toggleDark() {
+    setDark((v) => !v)
+  }
   function toggleDontShowHowTo() {
     setDontShowHowTo((v) => {
       const next = !v
@@ -428,6 +447,8 @@ export default function App() {
         <SettingsModal
           colorBlind={colorBlind}
           onToggleColorBlind={toggleColorBlind}
+          dark={dark}
+          onToggleDark={toggleDark}
           onClose={() => setShowSettings(false)}
         />
       )}

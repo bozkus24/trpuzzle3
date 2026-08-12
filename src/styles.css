@@ -1004,3 +1004,87 @@ body {
     font-size: 1.6rem;
   }
 }
+
+/* ================= KARANLIK MOD =================
+   Palet haritayla uyumlu: koyu mavi-slate zemin (deniz mavisiyle),
+   açık metin, koyu paneller. */
+:root[data-theme='dark'] {
+  --bg-top: #16242f;
+  --bg-bottom: #0d1620;
+  --bg-soft: #1c2a35;
+  --panel: #1b2a35;
+  --text: #e9eef3;
+  --muted: #a2b3c0;
+  --border: #31434f;
+  --map-empty: #34485a;
+  color-scheme: dark;
+}
+
+:root[data-theme='dark'] .topbar .icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Geri bildirim renkleri koyu zeminde biraz parlak */
+:root[data-theme='dark'] .feedback.hot {
+  color: #ff6a4d;
+}
+:root[data-theme='dark'] .feedback.cold {
+  color: #5b9bff;
+}
+
+/* Harita çerçevesi koyu zeminde biraz daha yumuşak gölge */
+:root[data-theme='dark'] .map-wrap {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Modallar (koyu) --- */
+:root[data-theme='dark'] .modal-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
+:root[data-theme='dark'] .modal-card {
+  background: #1b2a35;
+  color: var(--text);
+}
+:root[data-theme='dark'] .modal-x {
+  color: var(--muted);
+}
+:root[data-theme='dark'] .modal-title,
+:root[data-theme='dark'] .modal-sub b,
+:root[data-theme='dark'] .stat-num,
+:root[data-theme='dark'] .setting-name,
+:root[data-theme='dark'] .mode-option,
+:root[data-theme='dark'] .howto b {
+  color: var(--text);
+}
+:root[data-theme='dark'] .modal-sub,
+:root[data-theme='dark'] .stat-cap,
+:root[data-theme='dark'] .dist-title,
+:root[data-theme='dark'] .dist-label,
+:root[data-theme='dark'] .setting-desc,
+:root[data-theme='dark'] .howto,
+:root[data-theme='dark'] .dontshow {
+  color: var(--muted);
+}
+:root[data-theme='dark'] .stat-box {
+  background: #243441;
+}
+:root[data-theme='dark'] .dist-bar {
+  background: #3a4d5c;
+}
+:root[data-theme='dark'] .mode-option {
+  background: #243441;
+}
+:root[data-theme='dark'] .mode-option.active {
+  background: var(--accent);
+  color: #fff;
+}
+:root[data-theme='dark'] .toggle {
+  background: #3a4d5c;
+}
+:root[data-theme='dark'] .dontshow input {
+  background: #243441;
+  border-color: var(--border);
+}
+:root[data-theme='dark'] .howto-legend .sw {
+  border-color: rgba(255, 255, 255, 0.2);
+}

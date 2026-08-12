@@ -4,6 +4,7 @@ import GuessInput from './components/GuessInput'
 import StatsModal from './components/StatsModal'
 import HowToModal from './components/HowToModal'
 import SettingsModal from './components/SettingsModal'
+import ModeModal from './components/ModeModal'
 import { findProvince, MAX_BORDER_KM } from './lib/provinces'
 import {
   dailyProvince,
@@ -21,6 +22,7 @@ const DAILY_STORE = (key) => `iller-globle:daily:${key}`
 
 export default function App() {
   const [mode, setMode] = useState('daily') // 'daily' | 'practice'
+  const [showModeModal, setShowModeModal] = useState(false)
   const dateKey = useMemo(() => todayKey(), [])
 
   // Hedef il moda göre
@@ -249,52 +251,46 @@ export default function App() {
     <>
       <div className="topbar">
         <div className="topbar-inner">
-          <div className="topbar-left">
-            <img className="logo" src={logo} alt="Şehirle logo" />
-            <button
-              className={'icon-btn mode' + (mode === 'daily' ? ' active' : '')}
-              onClick={() => switchMode('daily')}
-              aria-label="Günün Şehri"
-              title="Günün Şehri"
-            >
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <rect
-                  x="3.5"
-                  y="5"
-                  width="17"
-                  height="15.5"
-                  rx="2.5"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-                <path d="M3.5 9.5h17" stroke="currentColor" strokeWidth="2" />
-                <path
-                  d="M8 3v4M16 3v4"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
-            <button
-              className={'icon-btn mode' + (mode === 'practice' ? ' active' : '')}
-              onClick={() => switchMode('practice')}
-              aria-label="Sınırsız Pratik"
-              title="Sınırsız Pratik"
-            >
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                  d="M9.83 9.17a4 4 0 1 0 0 5.66 10 10 0 0 0 2.17-2.83 10 10 0 0 1 2.17-2.83 4 4 0 1 1 0 5.66 10 10 0 0 1-2.17-2.83 10 10 0 0 0-2.17-2.83"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
+          <img className="logo" src={logo} alt="Şehirle logo" />
           <span className="brand">ŞEHİRLE</span>
           <div className="topbar-actions">
+            <button
+              className="icon-btn"
+              onClick={() => setShowModeModal(true)}
+              aria-label="Oyun modu"
+              title="Oyun modu"
+            >
+              {mode === 'daily' ? (
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <rect
+                    x="3.5"
+                    y="5"
+                    width="17"
+                    height="15.5"
+                    rx="2.5"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <path d="M3.5 9.5h17" stroke="currentColor" strokeWidth="2" />
+                  <path
+                    d="M8 3v4M16 3v4"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M9.83 9.17a4 4 0 1 0 0 5.66 10 10 0 0 0 2.17-2.83 10 10 0 0 1 2.17-2.83 4 4 0 1 1 0 5.66 10 10 0 0 1-2.17-2.83 10 10 0 0 0-2.17-2.83"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </button>
             <button
               className="icon-btn"
               onClick={() => {
@@ -433,6 +429,17 @@ export default function App() {
           colorBlind={colorBlind}
           onToggleColorBlind={toggleColorBlind}
           onClose={() => setShowSettings(false)}
+        />
+      )}
+
+      {showModeModal && (
+        <ModeModal
+          mode={mode}
+          onSelect={(m) => {
+            switchMode(m)
+            setShowModeModal(false)
+          }}
+          onClose={() => setShowModeModal(false)}
         />
       )}
       </div>

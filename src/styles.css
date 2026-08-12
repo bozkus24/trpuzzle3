@@ -52,14 +52,35 @@ body {
   justify-content: center;
 }
 
-.topbar .logo {
+.topbar-left {
   position: absolute;
-  left: 16px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.topbar .logo {
+  height: 38px;
   width: auto;
   display: block;
+  margin-right: 2px;
+}
+
+/* Mod seçici ikon-kutucukları (takvim / sonsuzluk) */
+.topbar .icon-btn.mode {
+  color: var(--muted);
+}
+
+.topbar .icon-btn.mode.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.topbar .icon-btn.mode.active:hover {
+  background: var(--accent);
 }
 
 .topbar .brand {
@@ -139,13 +160,6 @@ body {
   gap: 8px;
   justify-content: center;
   margin: 12px 0 16px;
-}
-
-/* Mod seçici artık üst barın içinde (ikinci satır) */
-.topbar .modes {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 0 16px 10px;
 }
 
 .modes button {

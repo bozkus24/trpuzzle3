@@ -40,13 +40,13 @@ export default function HowToModal({ onClose, dontShow, onToggleDontShow, showDo
           </p>
           <ul className="howto-legend">
             <li>
-              <span className="sw" style={{ background: '#f3ead6' }} /> Uzak (soğuk)
+              <span className="sw" style={{ background: '#f3ead6' }} /> Uzak
             </li>
             <li>
               <span className="sw" style={{ background: '#e8873b' }} /> Orta
             </li>
             <li>
-              <span className="sw" style={{ background: '#b21f1f' }} /> Yakın (sıcak)
+              <span className="sw" style={{ background: '#b21f1f' }} /> Yakın
             </li>
             <li>
               <span className="sw" style={{ background: '#3f8a2e' }} /> Doğru şehir

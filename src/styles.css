@@ -49,14 +49,16 @@ body {
   min-height: 56px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .topbar .logo {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
   height: 47px;
   width: auto;
   display: block;

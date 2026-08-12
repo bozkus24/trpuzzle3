@@ -270,8 +270,10 @@ export default function App() {
     <>
       <div className="topbar">
         <div className="topbar-inner">
-          <img className="logo" src={logoDark} alt="Şehirle logo" />
-          <span className="brand">ŞEHİRLE</span>
+          <div className="brand-group">
+            <img className="logo" src={logoDark} alt="Şehirle logo" />
+            <span className="brand">ŞEHİRLE</span>
+          </div>
           <div className="topbar-actions">
             <button
               className="icon-btn"

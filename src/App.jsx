@@ -291,34 +291,28 @@ export default function App() {
               aria-label="Ayarlar"
               title="Ayarlar"
             >
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <circle cx="12" cy="12" r="3.2" stroke="currentColor" strokeWidth="2" />
-                <path
-                  d="M12 2.5v2.2M12 19.3v2.2M21.5 12h-2.2M4.7 12H2.5M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6M18.7 18.7l-1.6-1.6M6.9 6.9 5.3 5.3"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54A.48.48 0 0 0 13.4 2h-3.84a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L1.8 8.47a.49.49 0 0 0 .12.61l2.03 1.58c-.05.3-.07.62-.07.94 0 .33.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z" />
               </svg>
             </button>
           </div>
         </div>
+        <div className="modes">
+          <button
+            className={mode === 'daily' ? 'active' : ''}
+            onClick={() => switchMode('daily')}
+          >
+            Günün Şehri
+          </button>
+          <button
+            className={mode === 'practice' ? 'active' : ''}
+            onClick={() => switchMode('practice')}
+          >
+            Sınırsız Pratik
+          </button>
+        </div>
       </div>
       <div className="app">
-      <div className="modes">
-        <button
-          className={mode === 'daily' ? 'active' : ''}
-          onClick={() => switchMode('daily')}
-        >
-          Günün Şehri
-        </button>
-        <button
-          className={mode === 'practice' ? 'active' : ''}
-          onClick={() => switchMode('practice')}
-        >
-          Sınırsız Pratik
-        </button>
-      </div>
 
       {/* Tahmin kutusu haritanın ÜSTÜNDE; geri bildirim butonun altında */}
       {!finished ? (

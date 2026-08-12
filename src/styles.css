@@ -141,6 +141,13 @@ body {
   margin: 12px 0 16px;
 }
 
+/* Mod seçici artık üst barın içinde (ikinci satır) */
+.topbar .modes {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 16px 10px;
+}
+
 .modes button {
   flex: 1;
   max-width: 220px;

@@ -793,6 +793,20 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Nasıl Oynanır başlığı + soru işareti */
+.howto-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.howto-q {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+
 /* Oyun modu seçenekleri */
 .mode-options {
   display: flex;

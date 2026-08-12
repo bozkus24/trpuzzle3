@@ -864,12 +864,57 @@ body {
 }
 
 /* Ayarlar satırı + toggle */
+.settings-title {
+  text-align: left;
+  margin-bottom: 6px;
+}
+
 .setting-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 6px 0 14px;
+  padding: 18px 0;
+}
+
+.setting-row + .setting-row {
+  border-top: 1px solid var(--border);
+}
+
+/* Tema açılır menüsü */
+.setting-select {
+  position: relative;
+  flex: none;
+}
+
+.setting-select select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 10px 34px 10px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.setting-select select:focus {
+  border-color: var(--accent);
+}
+
+.setting-select .chev {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  color: var(--muted);
 }
 
 .setting-text {

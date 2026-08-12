@@ -103,9 +103,6 @@ export default function App() {
       localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light')
     } catch {}
   }, [dark])
-  function toggleDark() {
-    setDark((v) => !v)
-  }
   function toggleDontShowHowTo() {
     setDontShowHowTo((v) => {
       const next = !v
@@ -461,7 +458,7 @@ export default function App() {
           colorBlind={colorBlind}
           onToggleColorBlind={toggleColorBlind}
           dark={dark}
-          onToggleDark={toggleDark}
+          onSetDark={setDark}
           onClose={() => setShowSettings(false)}
         />
       )}

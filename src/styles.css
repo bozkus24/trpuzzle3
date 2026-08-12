@@ -1024,9 +1024,10 @@ body {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Logo koyu modda saydam zeminde — arka planı karanlık mod rengi olsun */
+/* Logo koyu modda beyaz versiyona döner (koyu barda net dursun) */
 :root[data-theme='dark'] .topbar .logo {
   background: transparent;
+  filter: brightness(0) invert(1);
 }
 
 /* Geri bildirim renkleri koyu zeminde biraz parlak */

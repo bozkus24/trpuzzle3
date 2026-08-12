@@ -1024,6 +1024,13 @@ body {
   background: rgba(255, 255, 255, 0.1);
 }
 
+/* Logo koyu zeminde açık renkli chip üzerinde dursun (kenarları kaybolmasın) */
+:root[data-theme='dark'] .topbar .logo {
+  background: #eef2f6;
+  border-radius: 8px;
+  padding: 3px 5px;
+}
+
 /* Geri bildirim renkleri koyu zeminde biraz parlak */
 :root[data-theme='dark'] .feedback.hot {
   color: #ff6a4d;

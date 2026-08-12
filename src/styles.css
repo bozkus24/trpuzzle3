@@ -181,7 +181,7 @@ body {
   border-radius: 16px;
 }
 
-/* Son yazılan şehir 1.6 sn yanıp söner (4 × 0.4 sn) */
+/* Son yazılan şehir 1.2 sn yanıp söner (4 × 0.3 sn) */
 @keyframes provBlink {
   0%,
   100% {
@@ -193,7 +193,7 @@ body {
 }
 
 .tr-map .prov-blink {
-  animation: provBlink 0.4s ease-in-out 4;
+  animation: provBlink 0.3s ease-in-out 4;
 }
 
 /* İç sınır yok — komşu path'ler arası antialias dikişini

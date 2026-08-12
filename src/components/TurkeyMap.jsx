@@ -134,7 +134,7 @@ export default function TurkeyMap({
               d={p.d}
               fill={p.top}
               stroke={p.outline}
-              strokeWidth={p.name === last ? 3 : 1.8}
+              strokeWidth={p.name === last ? 4.5 : 1.8}
               strokeLinejoin="round"
             >
               <title>{p.name}</title>

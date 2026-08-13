@@ -32,11 +32,12 @@ export default function HowToModal({ onClose, dontShow, onToggleDontShow, showDo
 
         <div className="howto">
           <p>
-            Türkiye'nin <b>81 ilinden</b> gizli bir şehri bul. Bir şehir adı yaz ve
-            tahmin et.
+            Oyunun amacı, Türkiye'nin <b>81 ilinden</b> seçilen gizli bir şehri
+            tahminlerle bulmaktır.
           </p>
           <p>
-            Her tahmin, gizli şehre olan <b>en yakın sınır mesafesine</b> göre boyanır:
+            Türkiye'den bir şehir ismi girin. Girdiğiniz şehir, gizli şehre olan
+            uzaklığı ölçüsünde bir renkle boyanır:
           </p>
           <ul className="howto-legend">
             <li>
@@ -53,12 +54,17 @@ export default function HowToModal({ onClose, dontShow, onToggleDontShow, showDo
             </li>
           </ul>
           <p>
-            Komşu iller <b>0 km</b>. Tahmin butonunun altında, bir önceki tahmine göre{' '}
-            <b>daha sıcak</b> ya da <b>daha soğuk</b> olduğun yazar.
+            Komşu iller <b>0 km</b> uzaklıkta sayılır. Tahmin butonunun altında, bir
+            önceki tahmininize göre <b>daha sıcak</b> mı yoksa <b>daha soğuk</b> mu
+            olduğunuz yazar.
           </p>
           <p>
-            <b>Günün Şehri:</b> herkese aynı, günde bir. <b>Sınırsız Pratik:</b> rastgele,
-            istediğin kadar.
+            <b>Günün Şehri:</b> Her gün değişen ve herkeste aynı olan gizli şehri, en
+            az tahminle bulmaya çalışırsınız.
+          </p>
+          <p>
+            <b>Sınırsız Pratik:</b> Kendinizi dilediğiniz kadar deneyerek coğrafya
+            bilginizi geliştirebilirsiniz.
           </p>
         </div>
 

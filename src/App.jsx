@@ -201,6 +201,23 @@ export default function App() {
   // Bilgi satırı EN YAKIN (minimum sınır mesafesi) ile göre
   const closest = byDist.length ? byDist[0] : null
 
+  // Günün ili sonucu (mod ne olursa olsun localStorage'dan)
+  const dailyAnswer = useMemo(() => dailyProvince(dateKey).name, [dateKey])
+  const daily = useMemo(() => {
+    try {
+      const raw = localStorage.getItem(DAILY_STORE(dateKey))
+      if (!raw) return { played: false, finished: false, won: false, count: 0 }
+      const data = JSON.parse(raw)
+      const count = (data.guesses || []).length
+      const w = !!data.won
+      const g = !!data.gaveUp
+      return { played: count > 0, finished: w || g, won: w, gaveUp: g, count }
+    } catch {
+      return { played: false, finished: false, won: false, count: 0 }
+    }
+    // showStats/guesses/won/gaveUp değişince tazele
+  }, [dateKey, guesses, won, gaveUp, showStats])
+
   function newPractice() {
     setPracticeTarget(randomProvince(practiceTarget))
     setGuesses([])
@@ -237,9 +254,13 @@ export default function App() {
 
   const [copied, setCopied] = useState(false)
   function share() {
-    const n = guesses.length
-    const head = mode === 'daily' ? `Şehirle — ${dateKey}` : `Şehirle — Pratik`
-    const result = won ? `${n} tahminde buldum.` : `Bulamadım.`
+    // Her zaman GÜNÜN sonucunu paylaş
+    const head = `Şehirle — ${dateKey}`
+    let result
+    if (daily.finished && daily.won) result = `Günün şehrini ${daily.count} tahminde buldum! 🎉`
+    else if (daily.finished) result = `Günün şehrini bulamadım. 😅`
+    else if (daily.count > 0) result = `Günün şehrini arıyorum… (${daily.count} tahmin)`
+    else result = `Günün şehrini tahmin etmeye başladım!`
     const text = `${head}\n${result}`
     navigator.clipboard?.writeText(text).then(
       () => {
@@ -429,10 +450,9 @@ export default function App() {
       {showStats && (
         <StatsModal
           stats={stats}
-          guessCount={guesses.length}
-          won={won}
+          daily={daily}
+          dailyAnswer={dailyAnswer}
           finished={finished}
-          answer={target.name}
           mode={mode}
           onClose={() => setShowStats(false)}
           onPrimary={onModalPrimary}

@@ -1,15 +1,14 @@
 import { avgGuesses, winPct, DIST_BUCKETS, bucketIndex } from '../lib/stats'
 
 /**
- * Oyun bitince açılan İstatistik popup'ı.
- * Üstte özet kutuları, altında kazanılan oyunların tahmin dağılımı grafiği.
+ * İstatistik popup'ı.
+ * Üstte GÜNÜN sonucu, altında genel istatistikler + tahmin dağılımı ve Paylaş.
  */
 export default function StatsModal({
   stats,
-  guessCount,
-  won,
+  daily,
+  dailyAnswer,
   finished,
-  answer,
   mode,
   onClose,
   onPrimary,
@@ -26,7 +25,30 @@ export default function StatsModal({
   ]
 
   const maxDist = Math.max(1, ...stats.dist)
-  const activeBucket = won ? bucketIndex(guessCount) : -1
+  const activeBucket = daily.won ? bucketIndex(daily.count) : -1
+
+  let todayText
+  if (daily.finished && daily.won) {
+    todayText = (
+      <>
+        Günün şehri <b>{dailyAnswer}</b> — <b>{daily.count}</b> tahminde buldun!
+      </>
+    )
+  } else if (daily.finished) {
+    todayText = (
+      <>
+        Bulamadın. Doğru cevap: <b>{dailyAnswer}</b>
+      </>
+    )
+  } else if (daily.count > 0) {
+    todayText = (
+      <>
+        Henüz bulamadın — <b>{daily.count}</b> tahmin yaptın.
+      </>
+    )
+  } else {
+    todayText = <>Günün şehrini henüz tahmin etmedin.</>
+  }
 
   return (
     <div className="modal-overlay" onMouseDown={onClose}>
@@ -43,12 +65,13 @@ export default function StatsModal({
 
         <h2 className="modal-title">İstatistikler</h2>
 
-        {finished && !won && (
-          <p className="modal-sub">
-            Doğru cevap: <b>{answer}</b>
-          </p>
-        )}
+        {/* Günün sonucu */}
+        <div className={'today-card' + (daily.finished && daily.won ? ' win' : '')}>
+          <span className="today-label">Günün Şehri</span>
+          <span className="today-result">{todayText}</span>
+        </div>
 
+        {/* Genel istatistikler */}
         <div className="stat-grid">
           {summary.map(([label, value]) => (
             <div className="stat-box" key={label}>
@@ -75,16 +98,16 @@ export default function StatsModal({
           ))}
         </div>
 
-        {finished && (
-          <div className="modal-actions">
-            <button className="modal-btn" onClick={onPrimary}>
+        <div className="modal-actions">
+          <button className="modal-btn" onClick={onShare}>
+            {shareLabel}
+          </button>
+          {finished && (
+            <button className="modal-btn ghost" onClick={onPrimary}>
               {mode === 'daily' ? 'Pratik' : 'Yeni oyun'}
             </button>
-            <button className="modal-btn" onClick={onShare}>
-              {shareLabel}
-            </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

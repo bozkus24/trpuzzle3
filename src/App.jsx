@@ -1,8 +1,10 @@
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import TurkeyMap from './components/TurkeyMap'
 import GuessInput from './components/GuessInput'
 import StatsModal from './components/StatsModal'
 import HowToModal from './components/HowToModal'
+import SettingsModal from './components/SettingsModal'
+import ModeModal from './components/ModeModal'
 import { findProvince, MAX_BORDER_KM } from './lib/provinces'
 import {
   dailyProvince,
@@ -11,14 +13,16 @@ import {
   evaluateGuess,
   proximity,
   heatColor,
+  targetColorFor,
 } from './lib/game'
 import { loadStats, recordDailyWin, recordDailyLoss } from './lib/stats'
-import logo from './logo.png'
+import logoDark from './logo-dark.png'
 
 const DAILY_STORE = (key) => `iller-globle:daily:${key}`
 
 export default function App() {
   const [mode, setMode] = useState('daily') // 'daily' | 'practice'
+  const [showModeModal, setShowModeModal] = useState(false)
   const dateKey = useMemo(() => todayKey(), [])
 
   // Hedef il moda göre
@@ -31,6 +35,15 @@ export default function App() {
 
   // Görünüm ayarı: sıralama (tahmin sırası mı, yakınlık mı)
   const [byGuessOrder, setByGuessOrder] = useState(false)
+
+  // Son yazılan şehir 2 sn yanıp söner
+  const [blinkName, setBlinkName] = useState(null)
+  const blinkTimer = useRef(null)
+  const startBlink = useCallback((name) => {
+    setBlinkName(name)
+    if (blinkTimer.current) clearTimeout(blinkTimer.current)
+    blinkTimer.current = setTimeout(() => setBlinkName(null), 1200)
+  }, [])
 
   // İstatistik popup'ı
   const [stats, setStats] = useState(() => loadStats())
@@ -54,6 +67,42 @@ export default function App() {
   })
   // ? ikonundan elle açıldı mı (o zaman "bir daha gösterme" gösterilmez)
   const [howToManual, setHowToManual] = useState(false)
+
+  // Ayarlar + renk körü modu
+  const CB_KEY = 'iller-globle:colorblind'
+  const [showSettings, setShowSettings] = useState(false)
+  const [colorBlind, setColorBlind] = useState(() => {
+    try {
+      return localStorage.getItem(CB_KEY) === '1'
+    } catch {
+      return false
+    }
+  })
+  function toggleColorBlind() {
+    setColorBlind((v) => {
+      const next = !v
+      try {
+        localStorage.setItem(CB_KEY, next ? '1' : '0')
+      } catch {}
+      return next
+    })
+  }
+
+  // Karanlık mod
+  const THEME_KEY = 'iller-globle:theme'
+  const [dark, setDark] = useState(() => {
+    try {
+      return localStorage.getItem(THEME_KEY) === 'dark'
+    } catch {
+      return false
+    }
+  })
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+    try {
+      localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light')
+    } catch {}
+  }, [dark])
   function toggleDontShowHowTo() {
     setDontShowHowTo((v) => {
       const next = !v
@@ -106,6 +155,7 @@ export default function App() {
       if (guesses.some((g) => g.name === province.name)) return
       const next = [...guesses, province]
       setGuesses(next)
+      startBlink(province.name)
       const isWin = province.name === target.name
       if (mode === 'daily') persistDaily(next, isWin, false)
       if (isWin) {
@@ -114,7 +164,7 @@ export default function App() {
         setShowStats(true)
       }
     },
-    [finished, guesses, target, mode, persistDaily, dateKey]
+    [finished, guesses, target, mode, persistDaily, dateKey, startBlink]
   )
 
   const evaluations = useMemo(
@@ -127,9 +177,9 @@ export default function App() {
     () =>
       evaluations.map((e) => {
         const prox = proximity(e.borderKm, MAX_BORDER_KM)
-        return { ...e, dist: e.borderKm, prox, color: heatColor(prox, e.isTarget) }
+        return { ...e, dist: e.borderKm, prox, color: heatColor(prox, e.isTarget, colorBlind) }
       }),
-    [evaluations]
+    [evaluations, colorBlind]
   )
 
   // Harita için renk eşlemesi
@@ -227,9 +277,48 @@ export default function App() {
     <>
       <div className="topbar">
         <div className="topbar-inner">
-          <img className="logo" src={logo} alt="Şehirle logo" />
-          <span className="brand">ŞEHİRLE</span>
+          <div className="brand-group">
+            <img className="logo" src={logoDark} alt="Şehirle logo" />
+            <span className="brand">ŞEHİRLE</span>
+          </div>
           <div className="topbar-actions">
+            <button
+              className="icon-btn"
+              onClick={() => setShowModeModal(true)}
+              aria-label="Oyun modu"
+              title="Oyun modu"
+            >
+              {mode === 'daily' ? (
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <rect
+                    x="3.5"
+                    y="5"
+                    width="17"
+                    height="15.5"
+                    rx="2.5"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <path d="M3.5 9.5h17" stroke="currentColor" strokeWidth="2" />
+                  <path
+                    d="M8 3v4M16 3v4"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M9.83 9.17a4 4 0 1 0 0 5.66 10 10 0 0 0 2.17-2.83 10 10 0 0 1 2.17-2.83 4 4 0 1 1 0 5.66 10 10 0 0 1-2.17-2.83 10 10 0 0 0-2.17-2.83"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </button>
             <button
               className="icon-btn"
               onClick={() => {
@@ -258,29 +347,32 @@ export default function App() {
               title="İstatistikler"
             >
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <rect x="3" y="12" width="4" height="8" rx="1" fill="currentColor" />
-                <rect x="10" y="7" width="4" height="13" rx="1" fill="currentColor" />
-                <rect x="17" y="3" width="4" height="17" rx="1" fill="currentColor" />
+                <rect x="4" y="11" width="4.2" height="9" rx="2.1" fill="currentColor" />
+                <rect x="9.9" y="4" width="4.2" height="16" rx="2.1" fill="currentColor" />
+                <rect x="15.8" y="8" width="4.2" height="12" rx="2.1" fill="currentColor" />
+              </svg>
+            </button>
+            <button
+              className="icon-btn"
+              onClick={() => setShowSettings(true)}
+              aria-label="Ayarlar"
+              title="Ayarlar"
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
+                <path
+                  d="M10.32 4.32c.43-1.76 2.93-1.76 3.36 0a1.72 1.72 0 0 0 2.57 1.06c1.54-.94 3.31.83 2.37 2.37a1.72 1.72 0 0 0 1.06 2.57c1.76.43 1.76 2.93 0 3.36a1.72 1.72 0 0 0-1.06 2.57c.94 1.54-.83 3.31-2.37 2.37a1.72 1.72 0 0 0-2.57 1.06c-.43 1.76-2.93 1.76-3.36 0a1.72 1.72 0 0 0-2.57-1.06c-1.54.94-3.31-.83-2.37-2.37a1.72 1.72 0 0 0-1.06-2.57c-1.76-.43-1.76-2.93 0-3.36a1.72 1.72 0 0 0 1.06-2.57c-.94-1.54.83-3.31 2.37-2.37 1 .61 2.3.07 2.57-1.06z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
           </div>
         </div>
       </div>
       <div className="app">
-      <div className="modes">
-        <button
-          className={mode === 'daily' ? 'active' : ''}
-          onClick={() => switchMode('daily')}
-        >
-          Günün Şehri
-        </button>
-        <button
-          className={mode === 'practice' ? 'active' : ''}
-          onClick={() => switchMode('practice')}
-        >
-          Sınırsız Pratik
-        </button>
-      </div>
 
       {/* Tahmin kutusu haritanın ÜSTÜNDE; geri bildirim butonun altında */}
       {!finished ? (
@@ -290,11 +382,19 @@ export default function App() {
         </>
       ) : (
         !showStats && (
-          <div className="reveal-banner">Gizemli Şehir {target.name}!</div>
+          <div className="reveal-banner" style={{ color: targetColorFor(colorBlind) }}>
+            Gizemli Şehir {target.name}!
+          </div>
         )
       )}
 
-      <TurkeyMap colors={colors} target={target} revealed={finished} />
+      <TurkeyMap
+        colors={colors}
+        target={target}
+        revealed={finished}
+        targetColor={targetColorFor(colorBlind)}
+        blink={blinkName}
+      />
 
       {guesses.length > 0 && (
         <section className="panel">
@@ -350,6 +450,27 @@ export default function App() {
             setShowHowTo(false)
             setHowToManual(false)
           }}
+        />
+      )}
+
+      {showSettings && (
+        <SettingsModal
+          colorBlind={colorBlind}
+          onToggleColorBlind={toggleColorBlind}
+          dark={dark}
+          onSetDark={setDark}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
+
+      {showModeModal && (
+        <ModeModal
+          mode={mode}
+          onSelect={(m) => {
+            switchMode(m)
+            setShowModeModal(false)
+          }}
+          onClose={() => setShowModeModal(false)}
         />
       )}
       </div>

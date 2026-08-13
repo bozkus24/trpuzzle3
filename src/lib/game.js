@@ -52,14 +52,22 @@ export function proximity(dist, max = MAX_BORDER_KM) {
 
 // Doğru il rengi — yeşil (referans tonu)
 export const TARGET_COLOR = '#3f8a2e'
+// Renk körü modu: doğru il mavi (kırmızı-yeşil karışmasın)
+export const TARGET_COLOR_CB = '#1f6feb'
+
+/** Doğru il rengi (renk körü moduna göre). */
+export function targetColorFor(colorBlind = false) {
+  return colorBlind ? TARGET_COLOR_CB : TARGET_COLOR
+}
 
 /**
  * Yakınlığa göre "sıcaklık" rengi. Mavi yok.
  * Uzak = açık krem, yaklaştıkça krem -> turuncu -> kırmızı -> koyu bordo.
- * En uzak seviye kremden daha açık; en yakın (0 km) koyu bordo. İsabet = yeşil.
+ * En uzak seviye kremden daha açık; en yakın (0 km) koyu bordo.
+ * İsabet = yeşil (renk körü modunda mavi).
  */
-export function heatColor(prox, isTarget = false) {
-  if (isTarget) return TARGET_COLOR // doğru il — yeşil
+export function heatColor(prox, isTarget = false, colorBlind = false) {
+  if (isTarget) return targetColorFor(colorBlind) // doğru il
   // 0 (en uzak) -> soluk krem ... 1 (en yakın) -> koyu bordo
   const stops = [
     [0.0, [250, 240, 222]], // en uzak — soluk krem (kremden açık)

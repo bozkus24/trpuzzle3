@@ -49,15 +49,17 @@ body {
   min-height: 56px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .topbar .logo {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 40px;
+  height: 47px;
   width: auto;
   display: block;
 }
@@ -177,6 +179,21 @@ body {
   height: auto;
   display: block;
   border-radius: 16px;
+}
+
+/* Son yazılan şehir 1.2 sn yanıp söner (3 × 0.4 sn) */
+@keyframes provBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.tr-map .prov-blink {
+  animation: provBlink 0.4s ease-in-out 3;
 }
 
 /* İç sınır yok — komşu path'ler arası antialias dikişini
@@ -791,6 +808,166 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Nasıl Oynanır başlığı + soru işareti */
+.howto-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.howto-q {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+
+/* Oyun modu seçenekleri */
+.mode-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mode-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: #0b1120;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mode-option:hover {
+  border-color: var(--accent);
+}
+
+.mode-option.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.mode-option .mode-ico {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+
+/* Ayarlar satırı + toggle */
+.settings-title {
+  text-align: left;
+  margin-bottom: 6px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+}
+
+.setting-row + .setting-row {
+  border-top: 1px solid var(--border);
+}
+
+/* Tema açılır menüsü */
+.setting-select {
+  position: relative;
+  flex: none;
+}
+
+.setting-select select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 10px 34px 10px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.setting-select select:focus {
+  border-color: var(--accent);
+}
+
+.setting-select .chev {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  color: var(--muted);
+}
+
+.setting-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.setting-name {
+  font-weight: 700;
+  color: #0b1120;
+  font-size: 1rem;
+}
+
+.setting-desc {
+  font-size: 0.85rem;
+  color: #4a5a6b;
+  line-height: 1.35;
+}
+
+.toggle {
+  flex: none;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  border: none;
+  background: #b9c6d4;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  padding: 0;
+}
+
+.toggle.on {
+  background: var(--accent);
+}
+
+.toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease;
+}
+
+.toggle.on .toggle-knob {
+  transform: translateX(20px);
+}
+
 /* Nasıl Oynanır içeriği */
 .howto {
   color: #24303f;
@@ -902,4 +1079,93 @@ body {
   .modal-title {
     font-size: 1.6rem;
   }
+}
+
+/* ================= KARANLIK MOD =================
+   Palet haritayla uyumlu: koyu mavi-slate zemin (deniz mavisiyle),
+   açık metin, koyu paneller. */
+:root[data-theme='dark'] {
+  --bg-top: #16242f;
+  --bg-bottom: #0d1620;
+  --bg-soft: #1c2a35;
+  --panel: #1b2a35;
+  --text: #e9eef3;
+  --muted: #a2b3c0;
+  --border: #31434f;
+  --map-empty: #34485a;
+  color-scheme: dark;
+}
+
+:root[data-theme='dark'] .topbar .icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Logo her iki modda aynı görsel/boyut; koyu modda saydam zemin */
+:root[data-theme='dark'] .topbar .logo {
+  background: transparent;
+}
+
+/* Geri bildirim renkleri koyu zeminde biraz parlak */
+:root[data-theme='dark'] .feedback.hot {
+  color: #ff6a4d;
+}
+:root[data-theme='dark'] .feedback.cold {
+  color: #5b9bff;
+}
+
+/* Harita çerçevesi koyu zeminde biraz daha yumuşak gölge */
+:root[data-theme='dark'] .map-wrap {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Modallar (koyu) --- */
+:root[data-theme='dark'] .modal-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
+:root[data-theme='dark'] .modal-card {
+  background: #1b2a35;
+  color: var(--text);
+}
+:root[data-theme='dark'] .modal-x {
+  color: var(--muted);
+}
+:root[data-theme='dark'] .modal-title,
+:root[data-theme='dark'] .modal-sub b,
+:root[data-theme='dark'] .stat-num,
+:root[data-theme='dark'] .setting-name,
+:root[data-theme='dark'] .mode-option,
+:root[data-theme='dark'] .howto b {
+  color: var(--text);
+}
+:root[data-theme='dark'] .modal-sub,
+:root[data-theme='dark'] .stat-cap,
+:root[data-theme='dark'] .dist-title,
+:root[data-theme='dark'] .dist-label,
+:root[data-theme='dark'] .setting-desc,
+:root[data-theme='dark'] .howto,
+:root[data-theme='dark'] .dontshow {
+  color: var(--muted);
+}
+:root[data-theme='dark'] .stat-box {
+  background: #243441;
+}
+:root[data-theme='dark'] .dist-bar {
+  background: #3a4d5c;
+}
+:root[data-theme='dark'] .mode-option {
+  background: #243441;
+}
+:root[data-theme='dark'] .mode-option.active {
+  background: var(--accent);
+  color: #fff;
+}
+:root[data-theme='dark'] .toggle {
+  background: #3a4d5c;
+}
+:root[data-theme='dark'] .dontshow input {
+  background: #243441;
+  border-color: var(--border);
+}
+:root[data-theme='dark'] .howto-legend .sw {
+  border-color: rgba(255, 255, 255, 0.2);
 }

@@ -19,6 +19,7 @@ import { loadStats, recordDailyWin, recordDailyLoss } from './lib/stats'
 import logoDark from './logo-dark.png'
 
 const DAILY_STORE = (key) => `iller-globle:daily:${key}`
+const MAX_GUESSES = 12 // 12 tahminde bilinemezse şehir gösterilir
 
 export default function App() {
   const [mode, setMode] = useState('daily') // 'daily' | 'practice'
@@ -157,11 +158,24 @@ export default function App() {
       setGuesses(next)
       startBlink(province.name)
       const isWin = province.name === target.name
-      if (mode === 'daily') persistDaily(next, isWin, false)
+      // 12 tahminde bilinemezse şehir gösterilir (oyun biter)
+      const outOfGuesses = !isWin && next.length >= MAX_GUESSES
       if (isWin) {
         setWon(true)
-        if (mode === 'daily') setStats(recordDailyWin(dateKey, next.length))
+        if (mode === 'daily') {
+          persistDaily(next, true, false)
+          setStats(recordDailyWin(dateKey, next.length))
+        }
         setShowStats(true)
+      } else if (outOfGuesses) {
+        setGaveUp(true)
+        if (mode === 'daily') {
+          persistDaily(next, false, true)
+          setStats(recordDailyLoss(dateKey))
+        }
+        setShowStats(true)
+      } else if (mode === 'daily') {
+        persistDaily(next, false, false)
       }
     },
     [finished, guesses, target, mode, persistDaily, dateKey, startBlink]

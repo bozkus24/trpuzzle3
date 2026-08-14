@@ -17,10 +17,10 @@ export default function StatsModal({
 }) {
   const summary = [
     ['Oynanan', stats.gamesPlayed],
-    ['Kazanma %', winPct(stats)],
+    ['Kazanma yüzdesi', winPct(stats)],
     ['Güncel seri', stats.currentStreak],
     ['En uzun seri', stats.maxStreak],
-    ['Ort. tahmin', avgGuesses(stats)],
+    ['Ortalama tahmin', avgGuesses(stats)],
     ['En iyi', stats.bestGuesses || '—'],
   ]
 

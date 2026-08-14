@@ -1,14 +1,12 @@
 // Günün ili istatistikleri (localStorage). Pratik mod istatistiği etkilemez.
 const KEY = 'iller-globle:stats'
 
-// Tahmin dağılımı kovaları (kazanılan oyunlar için)
+// Tahmin dağılımı kovaları (kazanılan oyunlar için). En fazla 12 tahmin.
 export const DIST_BUCKETS = [
-  { label: '1–2', min: 1, max: 2 },
-  { label: '3–4', min: 3, max: 4 },
-  { label: '5–6', min: 5, max: 6 },
-  { label: '7–9', min: 7, max: 9 },
-  { label: '10–14', min: 10, max: 14 },
-  { label: '15+', min: 15, max: Infinity },
+  { label: '1-3', min: 1, max: 3 },
+  { label: '4-6', min: 4, max: 6 },
+  { label: '7-9', min: 7, max: 9 },
+  { label: '10-12', min: 10, max: 12 },
 ]
 
 export function bucketIndex(guessCount) {
@@ -25,7 +23,7 @@ function defaults() {
     maxStreak: 0,
     guessSum: 0, // kazanılan oyunlardaki toplam tahmin (ortalama için)
     bestGuesses: 0, // en az tahminle kazanma (0 = yok)
-    dist: [0, 0, 0, 0, 0, 0], // kazanılan oyunların tahmin dağılımı
+    dist: DIST_BUCKETS.map(() => 0), // kazanılan oyunların tahmin dağılımı
   }
 }
 
@@ -33,9 +31,9 @@ export function loadStats() {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY)) || {}
     const s = { ...defaults(), ...raw }
-    // Eski kayıtlarda dist eksikse tamamla
+    // Eski kayıtlarda dist eksik/farklı uzunluktaysa sıfırla
     if (!Array.isArray(s.dist) || s.dist.length !== DIST_BUCKETS.length) {
-      s.dist = [0, 0, 0, 0, 0, 0]
+      s.dist = DIST_BUCKETS.map(() => 0)
     }
     return s
   } catch {

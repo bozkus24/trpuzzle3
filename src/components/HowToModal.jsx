@@ -20,8 +20,8 @@ export default function HowToModal({ onClose, dontShow, onToggleDontShow, showDo
 
         <div className="howto">
           <p>
-            Oyunun amacı, Türkiye'nin <b>81 ilinden</b> seçilen gizli bir şehri
-            tahminlerle bulmaktır.
+            Oyunun amacı, Türkiye'nin <b>81 ilinden</b> seçilen gizli bir şehri{' '}
+            <b>12 tahmin</b> içerisinde bulmaktır.
           </p>
           <p>
             Türkiye'den bir şehir ismi girin. Girdiğiniz şehir, gizli şehre olan

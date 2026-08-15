@@ -12,7 +12,7 @@ function CalendarIcon() {
 
 function InfinityIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="mode-ico">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="mode-ico inf">
       <path
         d="M9.83 9.17a4 4 0 1 0 0 5.66 10 10 0 0 0 2.17-2.83 10 10 0 0 1 2.17-2.83 4 4 0 1 1 0 5.66 10 10 0 0 1-2.17-2.83 10 10 0 0 0-2.17-2.83"
         stroke="currentColor"

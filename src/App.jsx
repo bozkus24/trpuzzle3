@@ -5,6 +5,7 @@ import StatsModal from './components/StatsModal'
 import HowToModal from './components/HowToModal'
 import SettingsModal from './components/SettingsModal'
 import ModeModal from './components/ModeModal'
+import ResultModal from './components/ResultModal'
 import { findProvince, MAX_BORDER_KM } from './lib/provinces'
 import {
   dailyProvince,
@@ -49,6 +50,8 @@ export default function App() {
   // İstatistik popup'ı
   const [stats, setStats] = useState(() => loadStats())
   const [showStats, setShowStats] = useState(false)
+  // Sınırsız mod sonuç popup'ı
+  const [showResult, setShowResult] = useState(false)
 
   // "Nasıl Oynanır" popup'ı — ilk açılışta göster (bir daha gösterme seçilmediyse)
   const HOWTO_KEY = 'iller-globle:howto-hidden'
@@ -165,15 +168,19 @@ export default function App() {
         if (mode === 'daily') {
           persistDaily(next, true, false)
           setStats(recordDailyWin(dateKey, next.length))
+          setShowStats(true)
+        } else {
+          setShowResult(true)
         }
-        setShowStats(true)
       } else if (outOfGuesses) {
         setGaveUp(true)
         if (mode === 'daily') {
           persistDaily(next, false, true)
           setStats(recordDailyLoss(dateKey))
+          setShowStats(true)
+        } else {
+          setShowResult(true)
         }
-        setShowStats(true)
       } else if (mode === 'daily') {
         persistDaily(next, false, false)
       }
@@ -238,6 +245,7 @@ export default function App() {
     setWon(false)
     setGaveUp(false)
     setShowStats(false)
+    setShowResult(false)
   }
 
   function giveUp() {
@@ -245,13 +253,16 @@ export default function App() {
     if (mode === 'daily') {
       persistDaily(guesses, false, true)
       setStats(recordDailyLoss(dateKey))
+      setShowStats(true)
+    } else {
+      setShowResult(true)
     }
-    setShowStats(true)
   }
 
   function switchMode(m) {
     setMode(m)
     setShowStats(false)
+    setShowResult(false)
     if (m === 'practice') {
       setGuesses([])
       setWon(false)
@@ -472,6 +483,16 @@ export default function App() {
           onPrimary={onModalPrimary}
           onShare={share}
           shareLabel={copied ? 'Kopyalandı' : 'Paylaş'}
+        />
+      )}
+
+      {showResult && mode === 'practice' && (
+        <ResultModal
+          won={won}
+          answer={target.name}
+          count={guesses.length}
+          onNewGame={newPractice}
+          onClose={() => setShowResult(false)}
         />
       )}
 

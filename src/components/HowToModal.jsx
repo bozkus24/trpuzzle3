@@ -20,7 +20,7 @@ export default function HowToModal({ onClose, dontShow, onToggleDontShow, showDo
 
         <div className="howto">
           <p>
-            Oyunun amacı, Türkiye'nin <b>81 ilinden</b> seçilen gizli bir şehri{' '}
+            <b>Oyunun amacı</b>, Türkiye'nin <b>81 ilinden</b> seçilen gizli bir şehri{' '}
             <b>12 tahmin</b> içerisinde bulmaktır.
           </p>
           <p>
@@ -51,7 +51,7 @@ export default function HowToModal({ onClose, dontShow, onToggleDontShow, showDo
             az tahminle bulmaya çalışırsınız.
           </p>
           <p>
-            <b>Sınırsız Pratik:</b> Kendinizi dilediğiniz kadar deneyerek coğrafya
+            <b>Sınırsız mod:</b> Kendinizi dilediğiniz kadar deneyerek coğrafi
             bilginizi geliştirebilirsiniz.
           </p>
         </div>
@@ -64,7 +64,7 @@ export default function HowToModal({ onClose, dontShow, onToggleDontShow, showDo
         )}
 
         <div className="modal-actions">
-          <button className="modal-btn" onClick={onClose}>
+          <button className="modal-btn wide" onClick={onClose}>
             Anladım
           </button>
         </div>

@@ -36,6 +36,9 @@ export function loadStats() {
     if (!Array.isArray(s.dist) || s.dist.length !== DIST_BUCKETS.length) {
       s.dist = DIST_BUCKETS.map(() => 0)
     }
+    // Eski kayıtlarda gamesPlayed yoktu; her kazanma bir oynanan oyundur.
+    // Tutarsızlığı gider (aksi halde kazanma yüzdesi %100'ü aşabilir).
+    if (s.gamesPlayed < s.gamesWon) s.gamesPlayed = s.gamesWon
     return s
   } catch {
     return defaults()
@@ -98,7 +101,8 @@ export function avgGuesses(s) {
   return s.gamesWon ? Math.round((s.guessSum / s.gamesWon) * 10) / 10 : 0
 }
 
-/** Kazanma yüzdesi (tamamlanan günlük oyunlara göre). */
+/** Kazanma yüzdesi (tamamlanan günlük oyunlara göre; 0-100 arası). */
 export function winPct(s) {
-  return s.gamesPlayed ? Math.round((s.gamesWon / s.gamesPlayed) * 100) : 0
+  if (!s.gamesPlayed) return 0
+  return Math.min(100, Math.round((s.gamesWon / s.gamesPlayed) * 100))
 }

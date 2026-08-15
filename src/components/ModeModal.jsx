@@ -53,7 +53,7 @@ export default function ModeModal({ mode, onSelect, onClose }) {
             onClick={() => onSelect('practice')}
           >
             <InfinityIcon />
-            Sınırsız Pratik
+            Sınırsız
           </button>
         </div>
       </div>

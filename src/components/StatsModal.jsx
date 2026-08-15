@@ -31,7 +31,7 @@ export default function StatsModal({
   if (daily.finished && daily.won) {
     todayText = (
       <>
-        Günün şehri <b>{dailyAnswer}</b> — <b>{daily.count}</b> tahminde buldun!
+        Gizemli Şehir <b>{dailyAnswer}</b> - <b>{daily.count}</b> tahminde buldun!
       </>
     )
   } else if (daily.finished) {
@@ -67,7 +67,7 @@ export default function StatsModal({
 
         {/* Günün sonucu */}
         <div className={'today-card' + (daily.finished && daily.won ? ' win' : '')}>
-          <span className="today-label">Günün Şehri</span>
+          <span className="today-label">GÜNÜN ŞEHRİ</span>
           <span className="today-result">{todayText}</span>
         </div>
 

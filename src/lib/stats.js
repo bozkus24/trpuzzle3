@@ -3,7 +3,8 @@ const KEY = 'iller-globle:stats'
 
 // Tahmin dağılımı kovaları (kazanılan oyunlar için). En fazla 12 tahmin.
 export const DIST_BUCKETS = [
-  { label: '1-3', min: 1, max: 3 },
+  { label: '1', min: 1, max: 1 },
+  { label: '2-3', min: 2, max: 3 },
   { label: '4-6', min: 4, max: 6 },
   { label: '7-9', min: 7, max: 9 },
   { label: '10-12', min: 10, max: 12 },

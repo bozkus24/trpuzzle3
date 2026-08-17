@@ -5,6 +5,7 @@ import StatsModal from './components/StatsModal'
 import HowToModal from './components/HowToModal'
 import SettingsModal from './components/SettingsModal'
 import ModeModal from './components/ModeModal'
+import ResultModal from './components/ResultModal'
 import { findProvince, MAX_BORDER_KM } from './lib/provinces'
 import {
   dailyProvince,
@@ -15,10 +16,27 @@ import {
   heatColor,
   targetColorFor,
 } from './lib/game'
-import { loadStats, recordDailyWin, recordDailyLoss } from './lib/stats'
+import {
+  loadStats,
+  recordDailyWin,
+  recordDailyLoss,
+  loadPracticeStats,
+  recordPracticeWin,
+  recordPracticeLoss,
+} from './lib/stats'
 import logoDark from './logo-dark.png'
 
 const DAILY_STORE = (key) => `iller-globle:daily:${key}`
+const MAX_GUESSES = 12 // 12 tahminde bilinemezse şehir gösterilir
+
+const AYLAR = [
+  'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+  'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık',
+]
+function formatDateTR(key) {
+  const [y, m, d] = key.split('-').map(Number)
+  return `${d} ${AYLAR[m - 1]} ${y}`
+}
 
 export default function App() {
   const [mode, setMode] = useState('daily') // 'daily' | 'practice'
@@ -45,9 +63,12 @@ export default function App() {
     blinkTimer.current = setTimeout(() => setBlinkName(null), 1200)
   }, [])
 
-  // İstatistik popup'ı
+  // İstatistik popup'ı (günlük + sınırsız ayrı)
   const [stats, setStats] = useState(() => loadStats())
+  const [practiceStats, setPracticeStats] = useState(() => loadPracticeStats())
   const [showStats, setShowStats] = useState(false)
+  // Sınırsız mod sonuç popup'ı
+  const [showResult, setShowResult] = useState(false)
 
   // "Nasıl Oynanır" popup'ı — ilk açılışta göster (bir daha gösterme seçilmediyse)
   const HOWTO_KEY = 'iller-globle:howto-hidden'
@@ -157,11 +178,30 @@ export default function App() {
       setGuesses(next)
       startBlink(province.name)
       const isWin = province.name === target.name
-      if (mode === 'daily') persistDaily(next, isWin, false)
+      // 12 tahminde bilinemezse şehir gösterilir (oyun biter)
+      const outOfGuesses = !isWin && next.length >= MAX_GUESSES
       if (isWin) {
         setWon(true)
-        if (mode === 'daily') setStats(recordDailyWin(dateKey, next.length))
-        setShowStats(true)
+        if (mode === 'daily') {
+          persistDaily(next, true, false)
+          setStats(recordDailyWin(dateKey, next.length))
+          setShowStats(true)
+        } else {
+          setPracticeStats(recordPracticeWin(next.length))
+          setShowResult(true)
+        }
+      } else if (outOfGuesses) {
+        setGaveUp(true)
+        if (mode === 'daily') {
+          persistDaily(next, false, true)
+          setStats(recordDailyLoss(dateKey))
+          setShowStats(true)
+        } else {
+          setPracticeStats(recordPracticeLoss())
+          setShowResult(true)
+        }
+      } else if (mode === 'daily') {
+        persistDaily(next, false, false)
       }
     },
     [finished, guesses, target, mode, persistDaily, dateKey, startBlink]
@@ -201,12 +241,30 @@ export default function App() {
   // Bilgi satırı EN YAKIN (minimum sınır mesafesi) ile göre
   const closest = byDist.length ? byDist[0] : null
 
+  // Günün ili sonucu (mod ne olursa olsun localStorage'dan)
+  const dailyAnswer = useMemo(() => dailyProvince(dateKey).name, [dateKey])
+  const daily = useMemo(() => {
+    try {
+      const raw = localStorage.getItem(DAILY_STORE(dateKey))
+      if (!raw) return { played: false, finished: false, won: false, count: 0 }
+      const data = JSON.parse(raw)
+      const count = (data.guesses || []).length
+      const w = !!data.won
+      const g = !!data.gaveUp
+      return { played: count > 0, finished: w || g, won: w, gaveUp: g, count }
+    } catch {
+      return { played: false, finished: false, won: false, count: 0 }
+    }
+    // showStats/guesses/won/gaveUp değişince tazele
+  }, [dateKey, guesses, won, gaveUp, showStats])
+
   function newPractice() {
     setPracticeTarget(randomProvince(practiceTarget))
     setGuesses([])
     setWon(false)
     setGaveUp(false)
     setShowStats(false)
+    setShowResult(false)
   }
 
   function giveUp() {
@@ -214,13 +272,17 @@ export default function App() {
     if (mode === 'daily') {
       persistDaily(guesses, false, true)
       setStats(recordDailyLoss(dateKey))
+      setShowStats(true)
+    } else {
+      setPracticeStats(recordPracticeLoss())
+      setShowResult(true)
     }
-    setShowStats(true)
   }
 
   function switchMode(m) {
     setMode(m)
     setShowStats(false)
+    setShowResult(false)
     if (m === 'practice') {
       setGuesses([])
       setWon(false)
@@ -237,9 +299,13 @@ export default function App() {
 
   const [copied, setCopied] = useState(false)
   function share() {
-    const n = guesses.length
-    const head = mode === 'daily' ? `Şehirle — ${dateKey}` : `Şehirle — Pratik`
-    const result = won ? `${n} tahminde buldum.` : `Bulamadım.`
+    // Her zaman GÜNÜN sonucunu paylaş
+    const head = `Şehirle — ${dateKey}`
+    let result
+    if (daily.finished && daily.won) result = `Günün şehrini ${daily.count} tahminde buldum! 🎉`
+    else if (daily.finished) result = `Günün şehrini bulamadım. 😅`
+    else if (daily.count > 0) result = `Günün şehrini arıyorum… (${daily.count} tahmin)`
+    else result = `Günün şehrini tahmin etmeye başladım!`
     const text = `${head}\n${result}`
     navigator.clipboard?.writeText(text).then(
       () => {
@@ -374,6 +440,12 @@ export default function App() {
       </div>
       <div className="app">
 
+      <div className="game-header">
+        {mode === 'daily'
+          ? `Günün Şehri · ${formatDateTR(dateKey)}`
+          : `Sınırsız #${finished ? practiceStats.gamesPlayed : practiceStats.gamesPlayed + 1}`}
+      </div>
+
       {/* Tahmin kutusu haritanın ÜSTÜNDE; geri bildirim butonun altında */}
       {!finished ? (
         <>
@@ -429,15 +501,25 @@ export default function App() {
       {showStats && (
         <StatsModal
           stats={stats}
-          guessCount={guesses.length}
-          won={won}
+          practiceStats={practiceStats}
+          daily={daily}
+          dailyAnswer={dailyAnswer}
           finished={finished}
-          answer={target.name}
           mode={mode}
           onClose={() => setShowStats(false)}
           onPrimary={onModalPrimary}
           onShare={share}
           shareLabel={copied ? 'Kopyalandı' : 'Paylaş'}
+        />
+      )}
+
+      {showResult && mode === 'practice' && (
+        <ResultModal
+          won={won}
+          answer={target.name}
+          count={guesses.length}
+          onNewGame={newPractice}
+          onClose={() => setShowResult(false)}
         />
       )}
 

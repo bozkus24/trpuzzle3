@@ -1,14 +1,14 @@
-// Günün ili istatistikleri (localStorage). Pratik mod istatistiği etkilemez.
-const KEY = 'iller-globle:stats'
+// İstatistikler (localStorage). Günlük ve Sınırsız ayrı tutulur.
+const KEY = 'iller-globle:stats' // günlük (mevcut)
+const KEY_PRACTICE = 'iller-globle:stats:practice' // sınırsız
 
-// Tahmin dağılımı kovaları (kazanılan oyunlar için)
+// Tahmin dağılımı kovaları (kazanılan oyunlar için). En fazla 12 tahmin.
 export const DIST_BUCKETS = [
-  { label: '1–2', min: 1, max: 2 },
-  { label: '3–4', min: 3, max: 4 },
-  { label: '5–6', min: 5, max: 6 },
-  { label: '7–9', min: 7, max: 9 },
-  { label: '10–14', min: 10, max: 14 },
-  { label: '15+', min: 15, max: Infinity },
+  { label: '1', min: 1, max: 1 },
+  { label: '2-3', min: 2, max: 3 },
+  { label: '4-6', min: 4, max: 6 },
+  { label: '7-9', min: 7, max: 9 },
+  { label: '10-12', min: 10, max: 12 },
 ]
 
 export function bucketIndex(guessCount) {
@@ -25,29 +25,44 @@ function defaults() {
     maxStreak: 0,
     guessSum: 0, // kazanılan oyunlardaki toplam tahmin (ortalama için)
     bestGuesses: 0, // en az tahminle kazanma (0 = yok)
-    dist: [0, 0, 0, 0, 0, 0], // kazanılan oyunların tahmin dağılımı
+    dist: DIST_BUCKETS.map(() => 0), // kazanılan oyunların tahmin dağılımı
   }
 }
 
-export function loadStats() {
+function loadFrom(key) {
   try {
-    const raw = JSON.parse(localStorage.getItem(KEY)) || {}
+    const raw = JSON.parse(localStorage.getItem(key)) || {}
     const s = { ...defaults(), ...raw }
-    // Eski kayıtlarda dist eksikse tamamla
+    // Eski kayıtlarda dist eksik/farklı uzunluktaysa sıfırla
     if (!Array.isArray(s.dist) || s.dist.length !== DIST_BUCKETS.length) {
-      s.dist = [0, 0, 0, 0, 0, 0]
+      s.dist = DIST_BUCKETS.map(() => 0)
     }
+    // Eski kayıtlarda gamesPlayed yoktu; her kazanma bir oynanan oyundur.
+    // Tutarsızlığı gider (aksi halde kazanma yüzdesi %100'ü aşabilir).
+    if (s.gamesPlayed < s.gamesWon) s.gamesPlayed = s.gamesWon
     return s
   } catch {
     return defaults()
   }
 }
 
-function save(s) {
+export function loadStats() {
+  return loadFrom(KEY)
+}
+
+export function loadPracticeStats() {
+  return loadFrom(KEY_PRACTICE)
+}
+
+function saveTo(key, s) {
   try {
-    localStorage.setItem(KEY, JSON.stringify(s))
+    localStorage.setItem(key, JSON.stringify(s))
   } catch {}
   return s
+}
+
+function save(s) {
+  return saveTo(KEY, s)
 }
 
 // 'YYYY-MM-DD' -> bir önceki gün
@@ -94,12 +109,42 @@ export function recordDailyLoss(dateKey) {
   })
 }
 
+/** Sınırsız mod kazanımını kaydeder (her oyun bağımsız; seri = üst üste galibiyet). */
+export function recordPracticeWin(guessCount) {
+  const s = loadPracticeStats()
+  const dist = s.dist.slice()
+  const bi = bucketIndex(guessCount)
+  if (bi >= 0) dist[bi] += 1
+  const streak = s.currentStreak + 1
+  return saveTo(KEY_PRACTICE, {
+    ...s,
+    gamesPlayed: s.gamesPlayed + 1,
+    gamesWon: s.gamesWon + 1,
+    currentStreak: streak,
+    maxStreak: Math.max(s.maxStreak, streak),
+    guessSum: s.guessSum + guessCount,
+    bestGuesses: s.bestGuesses ? Math.min(s.bestGuesses, guessCount) : guessCount,
+    dist,
+  })
+}
+
+/** Sınırsız mod kaybını kaydeder (oynanan oyun sayılır, seri sıfırlanır). */
+export function recordPracticeLoss() {
+  const s = loadPracticeStats()
+  return saveTo(KEY_PRACTICE, {
+    ...s,
+    gamesPlayed: s.gamesPlayed + 1,
+    currentStreak: 0,
+  })
+}
+
 /** Ortalama tahmin (kazanılan oyunlar). */
 export function avgGuesses(s) {
   return s.gamesWon ? Math.round((s.guessSum / s.gamesWon) * 10) / 10 : 0
 }
 
-/** Kazanma yüzdesi (tamamlanan günlük oyunlara göre). */
+/** Kazanma yüzdesi (tamamlanan günlük oyunlara göre; 0-100 arası). */
 export function winPct(s) {
-  return s.gamesPlayed ? Math.round((s.gamesWon / s.gamesPlayed) * 100) : 0
+  if (!s.gamesPlayed) return 0
+  return Math.min(100, Math.round((s.gamesWon / s.gamesPlayed) * 100))
 }

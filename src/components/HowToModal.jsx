@@ -16,27 +16,16 @@ export default function HowToModal({ onClose, dontShow, onToggleDontShow, showDo
           ×
         </button>
 
-        <h2 className="modal-title howto-title">
-          Nasıl Oynanır
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="howto-q">
-            <circle cx="12" cy="12" r="9.2" stroke="currentColor" strokeWidth="2" />
-            <path
-              d="M9.2 9.3c0-1.6 1.3-2.7 2.9-2.7 1.6 0 2.8 1 2.8 2.5 0 1.3-.8 1.9-1.8 2.5-.9.6-1.2 1-1.2 2"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <circle cx="11.9" cy="17" r="1.2" fill="currentColor" />
-          </svg>
-        </h2>
+        <h2 className="modal-title">Nasıl Oynanır</h2>
 
         <div className="howto">
           <p>
-            Türkiye'nin <b>81 ilinden</b> gizli bir şehri bul. Bir şehir adı yaz ve
-            tahmin et.
+            <b>Oyunun amacı</b>, Türkiye'nin <b>81 ilinden</b> seçilen gizli bir şehri{' '}
+            <b>12 tahmin</b> içerisinde bulmaktır.
           </p>
           <p>
-            Her tahmin, gizli şehre olan <b>en yakın sınır mesafesine</b> göre boyanır:
+            Türkiye'den bir şehir ismi girin. Girdiğiniz şehir, gizli şehre olan
+            uzaklığı ölçüsünde bir renkle boyanır:
           </p>
           <ul className="howto-legend">
             <li>
@@ -53,12 +42,17 @@ export default function HowToModal({ onClose, dontShow, onToggleDontShow, showDo
             </li>
           </ul>
           <p>
-            Komşu iller <b>0 km</b>. Tahmin butonunun altında, bir önceki tahmine göre{' '}
-            <b>daha sıcak</b> ya da <b>daha soğuk</b> olduğun yazar.
+            Komşu iller <b>0 km</b> uzaklıkta sayılır. Tahmin butonunun altında, bir
+            önceki tahmininize göre <b>daha sıcak</b> mı yoksa <b>daha soğuk</b> mu
+            olduğunuz yazar.
           </p>
           <p>
-            <b>Günün Şehri:</b> herkese aynı, günde bir. <b>Sınırsız Pratik:</b> rastgele,
-            istediğin kadar.
+            <b>Günün Şehri:</b> Her gün değişen ve herkeste aynı olan gizli şehri, en
+            az tahminle bulmaya çalışırsınız.
+          </p>
+          <p>
+            <b>Sınırsız mod:</b> Kendinizi dilediğiniz kadar deneyerek coğrafi
+            bilginizi geliştirebilirsiniz.
           </p>
         </div>
 
@@ -70,7 +64,7 @@ export default function HowToModal({ onClose, dontShow, onToggleDontShow, showDo
         )}
 
         <div className="modal-actions">
-          <button className="modal-btn" onClick={onClose}>
+          <button className="modal-btn wide" onClick={onClose}>
             Anladım
           </button>
         </div>

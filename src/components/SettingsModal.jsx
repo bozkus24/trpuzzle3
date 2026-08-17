@@ -50,9 +50,6 @@ export default function SettingsModal({
         <div className="setting-row">
           <div className="setting-text">
             <span className="setting-name">Renk körü modu</span>
-            <span className="setting-desc">
-              Doğru şehri mavi gösterir; kırmızı-yeşil ayrımı gerekmez.
-            </span>
           </div>
           <button
             className={'toggle' + (colorBlind ? ' on' : '')}

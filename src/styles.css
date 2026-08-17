@@ -205,6 +205,16 @@ body {
   stroke-linecap: round;
 }
 
+/* Oyun başlığı (günün şehri · tarih / sınırsız #n) */
+.game-header {
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: var(--muted);
+  margin: 2px 0 14px;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Tahmin kutusu */
 .guess-box {
   position: relative;
@@ -718,6 +728,83 @@ body {
   color: #0b1120;
 }
 
+/* İstatistik sekmeleri (Günlük / Sınırsız) */
+.stat-tabs {
+  display: flex;
+  gap: 0;
+  margin: 0 auto 16px;
+  max-width: 280px;
+  padding: 4px;
+  border-radius: 999px;
+  background: #e6edf5;
+  border: 1px solid var(--border);
+}
+
+.stat-tabs button {
+  flex: 1;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.stat-tabs button.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+:root[data-theme='dark'] .stat-tabs {
+  background: #1a2733;
+}
+
+/* Günün sonucu kartı */
+.today-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #eef4fb;
+}
+
+.today-card.win {
+  border-color: var(--accent);
+  background: rgba(47, 111, 115, 0.1);
+}
+
+.today-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #5b6b7d;
+}
+
+.today-result {
+  font-size: 1.05rem;
+  color: #0b1120;
+}
+
+.today-result b {
+  color: #0b1120;
+}
+
+.modal-btn.ghost {
+  background: var(--panel);
+  color: var(--accent);
+}
+
+.modal-btn.wide {
+  max-width: none;
+  width: 100%;
+}
+
 /* Özet kutuları */
 .stat-grid {
   display: grid;
@@ -772,12 +859,13 @@ body {
 }
 
 .dist-label {
-  width: 42px;
+  min-width: 48px;
   text-align: right;
   font-size: 0.85rem;
   font-weight: 700;
   color: #334155;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .dist-track {
@@ -808,18 +896,17 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Nasıl Oynanır başlığı + soru işareti */
-.howto-title {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+/* Sınırsız mod sonuç metni */
+.result-text {
+  text-align: center;
+  font-size: 1.15rem;
+  color: #0b1120;
+  margin: 8px 0 4px;
 }
 
-.howto-q {
-  width: 24px;
-  height: 24px;
-  flex: none;
+:root[data-theme='dark'] .result-text,
+:root[data-theme='dark'] .result-text b {
+  color: var(--text);
 }
 
 /* Oyun modu seçenekleri */
@@ -861,6 +948,12 @@ body {
   width: 22px;
   height: 22px;
   flex: none;
+}
+
+/* Sonsuzluk şekli ince olduğu için biraz büyüt (takvimle dengelensin) */
+.mode-option .mode-ico.inf {
+  width: 28px;
+  height: 28px;
 }
 
 /* Ayarlar satırı + toggle */
@@ -1146,8 +1239,24 @@ body {
 :root[data-theme='dark'] .dontshow {
   color: var(--muted);
 }
-:root[data-theme='dark'] .stat-box {
+:root[data-theme='dark'] .stat-box,
+:root[data-theme='dark'] .today-card {
   background: #243441;
+}
+:root[data-theme='dark'] .today-card.win {
+  background: rgba(47, 111, 115, 0.22);
+  border-color: var(--accent);
+}
+:root[data-theme='dark'] .today-result,
+:root[data-theme='dark'] .today-result b {
+  color: var(--text);
+}
+:root[data-theme='dark'] .today-label {
+  color: var(--muted);
+}
+:root[data-theme='dark'] .modal-btn.ghost {
+  background: #243441;
+  color: #e9eef3;
 }
 :root[data-theme='dark'] .dist-bar {
   background: #3a4d5c;

@@ -1,11 +1,13 @@
+import { useState } from 'react'
 import { avgGuesses, winPct, DIST_BUCKETS, bucketIndex } from '../lib/stats'
 
 /**
- * İstatistik popup'ı.
- * Üstte GÜNÜN sonucu, altında genel istatistikler + tahmin dağılımı ve Paylaş.
+ * İstatistik popup'ı. Günlük / Sınırsız ayrı; üstte sekme ile geçilir.
+ * Günlük sekmesinde ayrıca günün sonucu kartı gösterilir.
  */
 export default function StatsModal({
   stats,
+  practiceStats,
   daily,
   dailyAnswer,
   finished,
@@ -15,17 +17,20 @@ export default function StatsModal({
   onShare,
   shareLabel,
 }) {
+  const [tab, setTab] = useState(mode === 'practice' ? 'practice' : 'daily')
+  const s = tab === 'practice' ? practiceStats : stats
+
   const summary = [
-    ['Oynanan', stats.gamesPlayed],
-    ['Kazanma yüzdesi', winPct(stats)],
-    ['Güncel seri', stats.currentStreak],
-    ['En uzun seri', stats.maxStreak],
-    ['Ortalama tahmin', avgGuesses(stats)],
-    ['En iyi', stats.bestGuesses || '—'],
+    ['Oynanan', s.gamesPlayed],
+    ['Kazanma yüzdesi', winPct(s)],
+    ['Güncel seri', s.currentStreak],
+    ['En uzun seri', s.maxStreak],
+    ['Ortalama tahmin', avgGuesses(s)],
+    ['En iyi', s.bestGuesses || '—'],
   ]
 
-  const maxDist = Math.max(1, ...stats.dist)
-  const activeBucket = daily.won ? bucketIndex(daily.count) : -1
+  const maxDist = Math.max(1, ...s.dist)
+  const activeBucket = tab === 'daily' && daily.won ? bucketIndex(daily.count) : -1
 
   let todayText
   if (daily.finished && daily.won) {
@@ -65,13 +70,31 @@ export default function StatsModal({
 
         <h2 className="modal-title">İstatistikler</h2>
 
-        {/* Günün sonucu */}
-        <div className={'today-card' + (daily.finished && daily.won ? ' win' : '')}>
-          <span className="today-label">GÜNÜN ŞEHRİ</span>
-          <span className="today-result">{todayText}</span>
+        {/* Günlük / Sınırsız sekmesi */}
+        <div className="stat-tabs">
+          <button
+            className={tab === 'daily' ? 'active' : ''}
+            onClick={() => setTab('daily')}
+          >
+            Günlük
+          </button>
+          <button
+            className={tab === 'practice' ? 'active' : ''}
+            onClick={() => setTab('practice')}
+          >
+            Sınırsız
+          </button>
         </div>
 
-        {/* Genel istatistikler */}
+        {/* Günün sonucu (yalnızca Günlük) */}
+        {tab === 'daily' && (
+          <div className={'today-card' + (daily.finished && daily.won ? ' win' : '')}>
+            <span className="today-label">GÜNÜN ŞEHRİ</span>
+            <span className="today-result">{todayText}</span>
+          </div>
+        )}
+
+        {/* Özet kutuları */}
         <div className="stat-grid">
           {summary.map(([label, value]) => (
             <div className="stat-box" key={label}>
@@ -89,9 +112,9 @@ export default function StatsModal({
               <div className="dist-track">
                 <div
                   className={'dist-bar' + (i === activeBucket ? ' active' : '')}
-                  style={{ width: `${(stats.dist[i] / maxDist) * 100}%` }}
+                  style={{ width: `${(s.dist[i] / maxDist) * 100}%` }}
                 >
-                  <span className="dist-count">{stats.dist[i]}</span>
+                  <span className="dist-count">{s.dist[i]}</span>
                 </div>
               </div>
             </div>
@@ -99,9 +122,11 @@ export default function StatsModal({
         </div>
 
         <div className="modal-actions">
-          <button className="modal-btn" onClick={onShare}>
-            {shareLabel}
-          </button>
+          {tab === 'daily' && (
+            <button className="modal-btn" onClick={onShare}>
+              {shareLabel}
+            </button>
+          )}
           {finished && (
             <button className="modal-btn ghost" onClick={onPrimary}>
               {mode === 'daily' ? 'Pratik' : 'Yeni oyun'}

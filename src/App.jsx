@@ -16,7 +16,14 @@ import {
   heatColor,
   targetColorFor,
 } from './lib/game'
-import { loadStats, recordDailyWin, recordDailyLoss } from './lib/stats'
+import {
+  loadStats,
+  recordDailyWin,
+  recordDailyLoss,
+  loadPracticeStats,
+  recordPracticeWin,
+  recordPracticeLoss,
+} from './lib/stats'
 import logoDark from './logo-dark.png'
 
 const DAILY_STORE = (key) => `iller-globle:daily:${key}`
@@ -47,8 +54,9 @@ export default function App() {
     blinkTimer.current = setTimeout(() => setBlinkName(null), 1200)
   }, [])
 
-  // İstatistik popup'ı
+  // İstatistik popup'ı (günlük + sınırsız ayrı)
   const [stats, setStats] = useState(() => loadStats())
+  const [practiceStats, setPracticeStats] = useState(() => loadPracticeStats())
   const [showStats, setShowStats] = useState(false)
   // Sınırsız mod sonuç popup'ı
   const [showResult, setShowResult] = useState(false)
@@ -170,6 +178,7 @@ export default function App() {
           setStats(recordDailyWin(dateKey, next.length))
           setShowStats(true)
         } else {
+          setPracticeStats(recordPracticeWin(next.length))
           setShowResult(true)
         }
       } else if (outOfGuesses) {
@@ -179,6 +188,7 @@ export default function App() {
           setStats(recordDailyLoss(dateKey))
           setShowStats(true)
         } else {
+          setPracticeStats(recordPracticeLoss())
           setShowResult(true)
         }
       } else if (mode === 'daily') {
@@ -255,6 +265,7 @@ export default function App() {
       setStats(recordDailyLoss(dateKey))
       setShowStats(true)
     } else {
+      setPracticeStats(recordPracticeLoss())
       setShowResult(true)
     }
   }
@@ -475,6 +486,7 @@ export default function App() {
       {showStats && (
         <StatsModal
           stats={stats}
+          practiceStats={practiceStats}
           daily={daily}
           dailyAnswer={dailyAnswer}
           finished={finished}

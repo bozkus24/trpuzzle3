@@ -1,5 +1,6 @@
-// Günün ili istatistikleri (localStorage). Pratik mod istatistiği etkilemez.
-const KEY = 'iller-globle:stats'
+// İstatistikler (localStorage). Günlük ve Sınırsız ayrı tutulur.
+const KEY = 'iller-globle:stats' // günlük (mevcut)
+const KEY_PRACTICE = 'iller-globle:stats:practice' // sınırsız
 
 // Tahmin dağılımı kovaları (kazanılan oyunlar için). En fazla 12 tahmin.
 export const DIST_BUCKETS = [
@@ -28,9 +29,9 @@ function defaults() {
   }
 }
 
-export function loadStats() {
+function loadFrom(key) {
   try {
-    const raw = JSON.parse(localStorage.getItem(KEY)) || {}
+    const raw = JSON.parse(localStorage.getItem(key)) || {}
     const s = { ...defaults(), ...raw }
     // Eski kayıtlarda dist eksik/farklı uzunluktaysa sıfırla
     if (!Array.isArray(s.dist) || s.dist.length !== DIST_BUCKETS.length) {
@@ -45,11 +46,23 @@ export function loadStats() {
   }
 }
 
-function save(s) {
+export function loadStats() {
+  return loadFrom(KEY)
+}
+
+export function loadPracticeStats() {
+  return loadFrom(KEY_PRACTICE)
+}
+
+function saveTo(key, s) {
   try {
-    localStorage.setItem(KEY, JSON.stringify(s))
+    localStorage.setItem(key, JSON.stringify(s))
   } catch {}
   return s
+}
+
+function save(s) {
+  return saveTo(KEY, s)
 }
 
 // 'YYYY-MM-DD' -> bir önceki gün
@@ -91,6 +104,35 @@ export function recordDailyLoss(dateKey) {
   return save({
     ...s,
     lastPlayed: dateKey,
+    gamesPlayed: s.gamesPlayed + 1,
+    currentStreak: 0,
+  })
+}
+
+/** Sınırsız mod kazanımını kaydeder (her oyun bağımsız; seri = üst üste galibiyet). */
+export function recordPracticeWin(guessCount) {
+  const s = loadPracticeStats()
+  const dist = s.dist.slice()
+  const bi = bucketIndex(guessCount)
+  if (bi >= 0) dist[bi] += 1
+  const streak = s.currentStreak + 1
+  return saveTo(KEY_PRACTICE, {
+    ...s,
+    gamesPlayed: s.gamesPlayed + 1,
+    gamesWon: s.gamesWon + 1,
+    currentStreak: streak,
+    maxStreak: Math.max(s.maxStreak, streak),
+    guessSum: s.guessSum + guessCount,
+    bestGuesses: s.bestGuesses ? Math.min(s.bestGuesses, guessCount) : guessCount,
+    dist,
+  })
+}
+
+/** Sınırsız mod kaybını kaydeder (oynanan oyun sayılır, seri sıfırlanır). */
+export function recordPracticeLoss() {
+  const s = loadPracticeStats()
+  return saveTo(KEY_PRACTICE, {
+    ...s,
     gamesPlayed: s.gamesPlayed + 1,
     currentStreak: 0,
   })

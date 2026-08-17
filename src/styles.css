@@ -718,6 +718,40 @@ body {
   color: #0b1120;
 }
 
+/* İstatistik sekmeleri (Günlük / Sınırsız) */
+.stat-tabs {
+  display: flex;
+  gap: 0;
+  margin: 0 auto 16px;
+  max-width: 280px;
+  padding: 4px;
+  border-radius: 999px;
+  background: #e6edf5;
+  border: 1px solid var(--border);
+}
+
+.stat-tabs button {
+  flex: 1;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.stat-tabs button.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+:root[data-theme='dark'] .stat-tabs {
+  background: #1a2733;
+}
+
 /* Günün sonucu kartı */
 .today-card {
   display: flex;

@@ -29,6 +29,15 @@ import logoDark from './logo-dark.png'
 const DAILY_STORE = (key) => `iller-globle:daily:${key}`
 const MAX_GUESSES = 12 // 12 tahminde bilinemezse şehir gösterilir
 
+const AYLAR = [
+  'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+  'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık',
+]
+function formatDateTR(key) {
+  const [y, m, d] = key.split('-').map(Number)
+  return `${d} ${AYLAR[m - 1]} ${y}`
+}
+
 export default function App() {
   const [mode, setMode] = useState('daily') // 'daily' | 'practice'
   const [showModeModal, setShowModeModal] = useState(false)
@@ -430,6 +439,12 @@ export default function App() {
         </div>
       </div>
       <div className="app">
+
+      <div className="game-header">
+        {mode === 'daily'
+          ? `Günün Şehri · ${formatDateTR(dateKey)}`
+          : `Sınırsız #${finished ? practiceStats.gamesPlayed : practiceStats.gamesPlayed + 1}`}
+      </div>
 
       {/* Tahmin kutusu haritanın ÜSTÜNDE; geri bildirim butonun altında */}
       {!finished ? (

@@ -205,6 +205,16 @@ body {
   stroke-linecap: round;
 }
 
+/* Oyun başlığı (günün şehri · tarih / sınırsız #n) */
+.game-header {
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: var(--muted);
+  margin: 2px 0 14px;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Tahmin kutusu */
 .guess-box {
   position: relative;

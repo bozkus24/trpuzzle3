@@ -1278,3 +1278,9 @@ body {
 :root[data-theme='dark'] .howto-legend .sw {
   border-color: rgba(255, 255, 255, 0.2);
 }
+
+/* Masaüstünde "Nasıl oynanır" penceresi biraz daha geniş (mobil aynı kalır).
+   .modal-card genişliği width:min(430px,100%) olduğundan width override edilir. */
+@media (min-width: 760px) {
+  .modal-card:has(.howto) { width: min(600px, 100%); }
+}

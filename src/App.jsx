@@ -387,6 +387,18 @@ export default function App() {
             </button>
             <button
               className="icon-btn"
+              onClick={() => setShowStats(true)}
+              aria-label="İstatistikler"
+              title="İstatistikler"
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="4" y="11" width="4.2" height="9" rx="2.1" fill="currentColor" />
+                <rect x="9.9" y="4" width="4.2" height="16" rx="2.1" fill="currentColor" />
+                <rect x="15.8" y="8" width="4.2" height="12" rx="2.1" fill="currentColor" />
+              </svg>
+            </button>
+            <button
+              className="icon-btn"
               onClick={() => {
                 setHowToManual(true)
                 setShowHowTo(true)
@@ -404,18 +416,6 @@ export default function App() {
                   fill="none"
                 />
                 <circle cx="11.9" cy="17" r="1.2" fill="currentColor" />
-              </svg>
-            </button>
-            <button
-              className="icon-btn"
-              onClick={() => setShowStats(true)}
-              aria-label="İstatistikler"
-              title="İstatistikler"
-            >
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <rect x="4" y="11" width="4.2" height="9" rx="2.1" fill="currentColor" />
-                <rect x="9.9" y="4" width="4.2" height="16" rx="2.1" fill="currentColor" />
-                <rect x="15.8" y="8" width="4.2" height="12" rx="2.1" fill="currentColor" />
               </svg>
             </button>
             <button

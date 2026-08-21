@@ -7,9 +7,54 @@
     <meta name="theme-color" content="#0f172a" />
     <meta name="description" content="Şehirle — Türkiye'nin illerini tahmin et. Her tahminde mesafe ve sıcaklık ipucu al." />
     <title>Şehirle — Türkiye İl Tahmin Oyunu</title>
+    <link rel="canonical" href="https://trpuzzle.com/sehirle/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TrPuzzle" />
+    <meta property="og:title" content="Şehirle — Türkiye İl Tahmin Oyunu" />
+    <meta property="og:description" content="Türkiye'nin gizli ilini renk ve mesafe ipuçlarıyla bul. Her gün yeni şehir!" />
+    <meta property="og:url" content="https://trpuzzle.com/sehirle/" />
+    <meta property="og:image" content="https://trpuzzle.com/assets/logo.png" />
+    <meta name="twitter:card" content="summary" />
   </head>
   <body>
     <div id="root"></div>
+
+    <!-- ── Dizinlenebilir tanıtım içeriği: React uygulamasının altında statik olarak durur ── -->
+    <section class="tp-bilgi" id="bilgi">
+      <h1>Şehirle: Türkiye'nin gizli ilini bulma oyunu</h1>
+      <p>Şehirle, coğrafya sezgini her gün sınayan bir tahmin oyunudur: Türkiye'nin <strong>81 ilinden</strong> gizlice seçilen günün şehrini, <strong>en fazla 12 tahminde</strong> bulmaya çalışırsın. Her tahminin, gizli şehre ne kadar yaklaştığını harita üzerinde renkle söyler — soğuk renkler uzağı, sıcak renkler yakını anlatır.</p>
+      <h2>Nasıl oynanır?</h2>
+      <p>Kutuya bir il adı yaz ve tahmin et. Girdiğin il haritada, gizli şehre uzaklığına göre boyanır: açık ton <strong>uzak</strong>, turuncu <strong>orta</strong>, koyu kırmızı <strong>yakın</strong>, yeşil ise <strong>doğru şehir</strong> demektir. Komşu iller 0 km sayılır. Tahmin kutusunun altında bir önceki tahminine göre <strong>daha sıcak mı, daha soğuk mu</strong> olduğun da yazar. Günün Şehri'ni herkes aynı gün çözer; Sınırsız modda ise dilediğin kadar yeni şehirle pratik yapabilirsin.</p>
+      <h2>Strateji ipuçları</h2>
+      <ul>
+        <li><strong>Merkezden aç:</strong> İlk tahminde Ankara, Sivas ya da Kayseri gibi ülkenin ortasındaki bir ili seçersen, gelen renk tek hamlede yurdun yarısını eler.</li>
+        <li><strong>Üçgene al:</strong> Birbirinden uzak iki-üç tahminin renklerini birleştir; gizli şehir, "yakın" çıkan tahminlerin kesişim bölgesindedir.</li>
+        <li><strong>Komşuları kullan:</strong> Koyu kırmızı gördüğünde rastgele sıçrama — o ilin komşularını sırayla dene, 0 km'yi yakaladığında çember iyice daralır.</li>
+        <li><strong>Sıcak/soğuk göstergesine güven:</strong> İki benzer renk arasında kararsız kaldığında, son tahminin "daha sıcak" olup olmadığı yönü netleştirir.</li>
+      </ul>
+      <h2>Sık sorulan sorular</h2>
+      <p><strong>Yeni şehir ne zaman gelir?</strong> Her gün Türkiye saatiyle 00.00'da. Günün Şehri istatistiklerine işlenir; Sınırsız mod serbest antrenmandır.</p>
+      <p><strong>İl bilgim zayıf, oynayabilir miyim?</strong> Tam da bunun için ideal — birkaç günde Türkiye haritası zihninde şaşırtıcı biçimde netleşir.</p>
+      <p><strong>Verilerim nereye gidiyor?</strong> Hiçbir yere: ilerlemen yalnızca kendi tarayıcında saklanır, oyun hesap istemez ve internetsiz de çalışır.</p>
+    </section>
+
+    <footer class="tp-footer">
+      Bir <a href="https://trpuzzle.com/">TrPuzzle</a> oyunu — sekiz günlük Türkçe bulmacanın tamamını keşfet.<br>
+      <a href="https://trpuzzle.com/">Anasayfa</a> · <a href="https://trpuzzle.com/hakkinda.html">Hakkında</a> · <a href="https://trpuzzle.com/gizlilik.html">Gizlilik</a> · <a href="https://trpuzzle.com/kosullar.html">Koşullar</a>
+    </footer>
+
+    <style>
+      /* ── TrPuzzle bilgi bölümü ve mini footer ── */
+      .tp-bilgi{max-width:640px;margin:3rem auto 0;padding:1.75rem 1.4rem .5rem;border-top:1px solid rgba(128,128,128,.35);line-height:1.65;font-size:.95rem;text-align:left}
+      .tp-bilgi h1{font-size:1.35rem;line-height:1.3;margin:0 0 .5em}
+      .tp-bilgi h2{font-size:1.08rem;line-height:1.3;margin:1.5em 0 .5em}
+      .tp-bilgi p{margin:.6em 0}
+      .tp-bilgi ul{margin:.6em 0;padding-left:1.35rem}
+      .tp-bilgi li{margin:.35em 0}
+      .tp-footer{max-width:640px;margin:0 auto;padding:1.25rem 1.4rem 2rem;font-size:.8rem;opacity:.72;text-align:center;line-height:1.7}
+      .tp-footer a{color:inherit}
+    </style>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

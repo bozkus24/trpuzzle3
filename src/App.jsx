@@ -343,10 +343,10 @@ export default function App() {
     <>
       <div className="topbar">
         <div className="topbar-inner">
-          <div className="brand-group">
+          <a className="brand-group" href="/" aria-label="Ana sayfaya dön" title="Ana sayfa">
             <img className="logo" src={logoDark} alt="Şehirle logo" />
             <span className="brand">ŞEHİRLE</span>
-          </div>
+          </a>
           <div className="topbar-actions">
             <button
               className="icon-btn"

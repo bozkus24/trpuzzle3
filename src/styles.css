@@ -23,6 +23,8 @@ html,
 body {
   margin: 0;
   padding: 0;
+  /* Mobilde çift dokunma (double-tap) ile zoom'u engelle */
+  touch-action: manipulation;
 }
 
 body {

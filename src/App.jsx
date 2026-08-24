@@ -450,7 +450,9 @@ export default function App() {
       {!finished ? (
         <>
           <GuessInput onGuess={handleGuess} disabled={finished} guessedNames={guessedNames} />
-          <div className={'feedback ' + feedback.tone}>{feedback.text}</div>
+          {guesses.length > 0 && (
+            <div className={'feedback ' + feedback.tone}>{feedback.text}</div>
+          )}
         </>
       ) : (
         !showStats && (

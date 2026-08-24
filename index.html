@@ -15,8 +15,79 @@
     <meta property="og:url" content="https://trpuzzle.com/sehirle/" />
     <meta property="og:image" content="https://trpuzzle.com/assets/logo.png" />
     <meta name="twitter:card" content="summary" />
+
+    <!-- ── TrPuzzle ara sayfa (splash) — HER ZAMAN AYDINLIK, koyu mod yok ── -->
+    <style>
+#tp-splash{position:fixed;inset:0;z-index:99999;background:color-mix(in srgb, #a8479a 22%, #f4f2ec);
+  color:#1d1f24;display:flex;flex-direction:column;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;overscroll-behavior:contain}
+#tp-splash[hidden]{display:none}
+#tp-splash .tp-hd{flex:none;height:56px;display:flex;align-items:center;justify-content:center;
+  border-bottom:1px solid rgba(0,0,0,.08)}
+#tp-splash .tp-brand{font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:22px;
+  color:#1d1f24;text-decoration:none;letter-spacing:.3px}
+#tp-splash .tp-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:18px;padding:20px 24px 44px}
+#tp-splash .tp-ico{width:96px;height:96px;border-radius:24px;background:#fff;color:#a8479a;
+  display:flex;align-items:center;justify-content:center;flex:none}
+#tp-splash .tp-ico svg{width:58px;height:58px;display:block}
+#tp-splash .tp-ico .tp-foxmask{width:58px;height:58px;background:currentColor;
+  -webkit-mask:url(assets/tilkile.png) center/contain no-repeat;mask:url(assets/tilkile.png) center/contain no-repeat}
+#tp-splash .tp-name{font-family:"Fraunces",Georgia,"Times New Roman",serif;font-weight:700;
+  font-size:44px;line-height:1;letter-spacing:.5px;margin:0}
+#tp-splash .tp-tag{font-family:"Fraunces",Georgia,serif;font-size:20px;line-height:1.3;
+  color:#5b6068;max-width:24ch;margin:0}
+#tp-splash .tp-play{border:none;border-radius:999px;background:#1d1f24;color:#fff;font-size:19px;
+  font-weight:700;padding:16px 0;width:230px;max-width:80vw;cursor:pointer;margin-top:6px;
+  font-family:inherit;touch-action:manipulation}
+#tp-splash .tp-play:active{transform:translateY(1px)}
+#tp-splash .tp-meta{font-size:14px;line-height:1.8;color:#5b6068;margin-top:6px}
+#tp-splash .tp-by{display:block}
+@media(min-width:800px){
+  #tp-splash .tp-name{font-size:60px}
+  #tp-splash .tp-tag{font-size:27px}
+  #tp-splash .tp-ico{width:116px;height:116px}
+  #tp-splash .tp-ico svg,#tp-splash .tp-ico .tp-foxmask{width:70px;height:70px}
+}
+    </style>
   </head>
   <body>
+    <!-- ── TrPuzzle ara sayfa (splash) — React'ten bağımsız statik overlay ── -->
+    <div id="tp-splash">
+      <header class="tp-hd"><a class="tp-brand" href="/">TrPuzzle</a></header>
+      <div class="tp-body">
+        <div class="tp-ico"><svg viewBox="0 0 100 100">
+            <g fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round">
+              <rect x="18" y="44" width="20" height="38"/>
+              <rect x="42" y="26" width="22" height="56"/>
+              <rect x="68" y="52" width="16" height="30"/>
+            </g>
+            <g fill="currentColor">
+              <rect x="47" y="34" width="5" height="5"/>
+              <rect x="56" y="34" width="5" height="5"/>
+              <rect x="47" y="45" width="5" height="5"/>
+              <rect x="56" y="45" width="5" height="5"/>
+              <rect x="47" y="56" width="5" height="5"/>
+              <rect x="23" y="52" width="4.5" height="4.5"/>
+              <rect x="30" y="52" width="4.5" height="4.5"/>
+              <rect x="23" y="62" width="4.5" height="4.5"/>
+              <rect x="72" y="59" width="4" height="4"/>
+              <rect x="72" y="68" width="4" height="4"/>
+            </g>
+            <path d="M12 82 H88" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+          </svg></div>
+        <h1 class="tp-name">Şehirle</h1>
+        <p class="tp-tag">İpuçlarıyla Türkiye'nin gizli ilini bul.</p>
+        <button type="button" class="tp-play" id="tpPlay">Oyna</button>
+        <div class="tp-meta">
+          <span id="tpDate"></span><br>
+          <span id="tpNo"></span>
+          <span class="tp-by">Hazırlayan: TrPuzzle</span>
+        </div>
+      </div>
+    </div>
+
     <div id="root"></div>
 
     <!-- ── Dizinlenebilir tanıtım içeriği: React uygulamasının altında statik olarak durur ── -->
@@ -56,5 +127,22 @@
     </style>
 
     <script type="module" src="/src/main.jsx"></script>
+
+    <!-- ── TrPuzzle ara sayfa (splash) davranışı — düz script ── -->
+    <script>
+(function(){
+  var s=document.getElementById("tp-splash");
+  if(!s) return;
+  try{
+    var d=new Date();
+    var ay=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+    var de=document.getElementById("tpDate");
+    if(de) de.textContent=d.getDate()+" "+ay[d.getMonth()]+" "+d.getFullYear();
+  }catch(e){}
+  /* Şehirle'nin günlük hedefi tarih-hash'iyle seçilir; sıralı "Bulmaca No." yoktur — boş bırakıldı. */
+  var b=document.getElementById("tpPlay");
+  if(b) b.addEventListener("click",function(){ s.hidden=true; });
+})();
+    </script>
   </body>
 </html>

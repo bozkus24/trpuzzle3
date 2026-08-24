@@ -440,11 +440,11 @@ export default function App() {
       </div>
       <div className="app">
 
-      <div className="game-header">
-        {mode === 'daily'
-          ? `Günün Şehri · ${formatDateTR(dateKey)}`
-          : `Sınırsız #${finished ? practiceStats.gamesPlayed : practiceStats.gamesPlayed + 1}`}
-      </div>
+      {mode !== 'daily' && (
+        <div className="game-header">
+          {`Sınırsız #${finished ? practiceStats.gamesPlayed : practiceStats.gamesPlayed + 1}`}
+        </div>
+      )}
 
       {/* Tahmin kutusu haritanın ÜSTÜNDE; geri bildirim butonun altında */}
       {!finished ? (

@@ -307,13 +307,27 @@ export default function App() {
     else if (daily.count > 0) result = `Günün şehrini arıyorum… (${daily.count} tahmin)`
     else result = `Günün şehrini tahmin etmeye başladım!`
     const text = `${head}\n${result}`
-    navigator.clipboard?.writeText(text).then(
-      () => {
-        setCopied(true)
-        setTimeout(() => setCopied(false), 1800)
-      },
-      () => {}
-    )
+    const url = 'https://trpuzzle.com/sehirle/'
+    const kopyala = () =>
+      navigator.clipboard?.writeText(`${text}\n${url}`).then(
+        () => {
+          setCopied(true)
+          setTimeout(() => setCopied(false), 1800)
+        },
+        () => {}
+      )
+    // Tek buton: destekleyen cihazda sistem paylaş menüsünü açar (WhatsApp, X,
+    // Instagram, Telegram, kopyala…); desteklenmeyen yerde panoya kopyalar.
+    if (navigator.share) {
+      navigator
+        .share({ title: 'Şehirle', text, url })
+        .catch((hata) => {
+          if (hata && hata.name === 'AbortError') return // kullanıcı iptal etti
+          kopyala()
+        })
+      return
+    }
+    kopyala()
   }
 
   const guessedNames = useMemo(() => new Set(guesses.map((g) => g.name)), [guesses])

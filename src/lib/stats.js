@@ -17,8 +17,8 @@ export function bucketIndex(guessCount) {
 
 function defaults() {
   return {
-    lastWin: null, // 'YYYY-MM-DD' — son kazanılan gün (seri için)
-    lastPlayed: null, // 'YYYY-MM-DD' — biten son gün (oynanan gün sayımı için)
+    lastWin: null, // 'YYYY-MM-DD' - son kazanılan gün (seri için)
+    lastPlayed: null, // 'YYYY-MM-DD' - biten son gün (oynanan gün sayımı için)
     gamesPlayed: 0, // tamamlanan günlük oyun (kazanma + pes)
     gamesWon: 0,
     currentStreak: 0,

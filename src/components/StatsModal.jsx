@@ -26,7 +26,7 @@ export default function StatsModal({
     ['Güncel seri', s.currentStreak],
     ['En uzun seri', s.maxStreak],
     ['Ortalama tahmin', avgGuesses(s)],
-    ['En iyi', s.bestGuesses || '—'],
+    ['En iyi', s.bestGuesses || '-'],
   ]
 
   const maxDist = Math.max(1, ...s.dist)
@@ -48,7 +48,7 @@ export default function StatsModal({
   } else if (daily.count > 0) {
     todayText = (
       <>
-        Henüz bulamadın — <b>{daily.count}</b> tahmin yaptın.
+        Henüz bulamadın, <b>{daily.count}</b> tahmin yaptın.
       </>
     )
   } else {

@@ -11,6 +11,7 @@ import {
   dailyProvince,
   randomProvince,
   todayKey,
+  puzzleNo,
   evaluateGuess,
   proximity,
   heatColor,
@@ -70,7 +71,7 @@ export default function App() {
   // Sınırsız mod sonuç popup'ı
   const [showResult, setShowResult] = useState(false)
 
-  // "Nasıl Oynanır" popup'ı — ilk açılışta göster (bir daha gösterme seçilmediyse)
+  // "Nasıl Oynanır" popup'ı - ilk açılışta göster (bir daha gösterme seçilmediyse)
   const HOWTO_KEY = 'iller-globle:howto-hidden'
   const [dontShowHowTo, setDontShowHowTo] = useState(() => {
     try {
@@ -111,19 +112,44 @@ export default function App() {
 
   // Karanlık mod
   const THEME_KEY = 'iller-globle:theme'
-  const [dark, setDark] = useState(() => {
+  const cihazKoyu = () => {
     try {
-      return localStorage.getItem(THEME_KEY) === 'dark'
+      return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
     } catch {
       return false
     }
+  }
+  // Kayıtlı tercih varsa o, yoksa cihazın teması
+  const [dark, setDark] = useState(() => {
+    try {
+      const k = localStorage.getItem(THEME_KEY)
+      if (k === 'dark' || k === 'light') return k === 'dark'
+    } catch {}
+    return cihazKoyu()
   })
+  // Otomatik (cihazdan gelen) tema kaydedilmez; yalnızca kullanıcı seçerse kaydedilir
+  const temaSecildi = useRef(false)
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+    if (!temaSecildi.current) return
     try {
       localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light')
     } catch {}
   }, [dark])
+  // Kullanıcı elle seçmediyse cihaz teması değişince site de uyar
+  useEffect(() => {
+    if (temaSecildi.current) return
+    let mq
+    try {
+      mq = window.matchMedia('(prefers-color-scheme: dark)')
+    } catch {
+      return
+    }
+    const f = (e) => { if (!temaSecildi.current) setDark(e.matches) }
+    mq.addEventListener ? mq.addEventListener('change', f) : mq.addListener(f)
+    return () => { mq.removeEventListener ? mq.removeEventListener('change', f) : mq.removeListener(f) }
+  }, [])
+  const temayiSec = (v) => { temaSecildi.current = true; setDark(v) }
   function toggleDontShowHowTo() {
     setDontShowHowTo((v) => {
       const next = !v
@@ -300,16 +326,16 @@ export default function App() {
   const [copied, setCopied] = useState(false)
   function share() {
     // Her zaman GÜNÜN sonucunu paylaş
-    const head = `Şehirle — ${dateKey}`
+    const head = `Şehirle #${puzzleNo(dateKey)}`
     let result
-    if (daily.finished && daily.won) result = `Günün şehrini ${daily.count} tahminde buldum! 🎉`
-    else if (daily.finished) result = `Günün şehrini bulamadım. 😅`
+    if (daily.finished && daily.won) result = `Günün şehrini ${daily.count} tahminde buldum✅️`
+    else if (daily.finished) result = `Günün şehrini bulamadım❌️`
     else if (daily.count > 0) result = `Günün şehrini arıyorum… (${daily.count} tahmin)`
     else result = `Günün şehrini tahmin etmeye başladım!`
-    const text = `${head}\n${result}`
+    const text = `${head}\n\n${result}\n\nSen kaç tahminde bulabilirsin ?`
     const url = 'https://trpuzzle.com/sehirle/'
     const kopyala = () =>
-      navigator.clipboard?.writeText(`${text}\n${url}`).then(
+      navigator.clipboard?.writeText(`${text}\n\n${url}`).then(
         () => {
           setCopied(true)
           setTimeout(() => setCopied(false), 1800)
@@ -336,7 +362,7 @@ export default function App() {
   const feedback = useMemo(() => {
     if (!evals.length) return { text: 'Bir şehir adı yaz ve tahmine başla.', tone: 'hint' }
     const last = evals[evals.length - 1]
-    if (last.isTarget) return { text: `${last.province.name} — doğru!`, tone: 'hit' }
+    if (last.isTarget) return { text: `${last.province.name} doğru!`, tone: 'hit' }
     const word = (p) =>
       p >= 0.8 ? 'çok sıcak' : p >= 0.6 ? 'sıcak' : p >= 0.4 ? 'ılık' : p >= 0.2 ? 'soğuk' : 'çok soğuk'
     if (evals.length === 1) {
@@ -401,6 +427,18 @@ export default function App() {
             </button>
             <button
               className="icon-btn"
+              onClick={() => setShowStats(true)}
+              aria-label="İstatistikler"
+              title="İstatistikler"
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="4" y="11" width="4.2" height="9" rx="2.1" fill="currentColor" />
+                <rect x="9.9" y="4" width="4.2" height="16" rx="2.1" fill="currentColor" />
+                <rect x="15.8" y="8" width="4.2" height="12" rx="2.1" fill="currentColor" />
+              </svg>
+            </button>
+            <button
+              className="icon-btn"
               onClick={() => {
                 setHowToManual(true)
                 setShowHowTo(true)
@@ -418,18 +456,6 @@ export default function App() {
                   fill="none"
                 />
                 <circle cx="11.9" cy="17" r="1.2" fill="currentColor" />
-              </svg>
-            </button>
-            <button
-              className="icon-btn"
-              onClick={() => setShowStats(true)}
-              aria-label="İstatistikler"
-              title="İstatistikler"
-            >
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <rect x="4" y="11" width="4.2" height="9" rx="2.1" fill="currentColor" />
-                <rect x="9.9" y="4" width="4.2" height="16" rx="2.1" fill="currentColor" />
-                <rect x="15.8" y="8" width="4.2" height="12" rx="2.1" fill="currentColor" />
               </svg>
             </button>
             <button
@@ -554,7 +580,7 @@ export default function App() {
           colorBlind={colorBlind}
           onToggleColorBlind={toggleColorBlind}
           dark={dark}
-          onSetDark={setDark}
+          onSetDark={temayiSec}
           onClose={() => setShowSettings(false)}
         />
       )}

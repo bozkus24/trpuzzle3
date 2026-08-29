@@ -203,7 +203,7 @@ export function borderDistanceKm(a, b) {
   return arc
 }
 
-// Sınırdaş sayılma eşiği (km) — ortak sınır koordinatları çakıştığından ~0 çıkar
+// Sınırdaş sayılma eşiği (km) - ortak sınır koordinatları çakıştığından ~0 çıkar
 export const NEIGHBOR_EPS_KM = 3
 
 /** İki il sınırdaş (komşu) mı? */
@@ -212,5 +212,5 @@ export function areNeighbors(a, b) {
   return borderDistanceKm(a, b) <= NEIGHBOR_EPS_KM
 }
 
-// En uzak iki ilin kuş uçuşu sınır mesafesi (Edirne <-> Hakkari ~1470km) — palet kalibrasyonu
+// En uzak iki ilin kuş uçuşu sınır mesafesi (Edirne <-> Hakkari ~1470km) - palet kalibrasyonu
 export const MAX_BORDER_KM = 1470

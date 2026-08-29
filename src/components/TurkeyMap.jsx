@@ -49,7 +49,7 @@ export default function TurkeyMap({
     return { paths, cy }
   }, [])
 
-  // Kara maskesi (Türkiye + komşular) — relief'i karaya kırpar, deniz mavi kalır
+  // Kara maskesi (Türkiye + komşular) - relief'i karaya kırpar, deniz mavi kalır
   const landPath = useMemo(
     () => pathGen({ type: 'MultiPolygon', coordinates: LAND }),
     []
@@ -111,7 +111,7 @@ export default function TurkeyMap({
           clipPath="url(#land-mask)"
         />
 
-        {/* Türkiye ulusal sınırı — belirgin koyu bant */}
+        {/* Türkiye ulusal sınırı - belirgin koyu bant */}
         <g filter="url(#tr-border)" opacity="0.9">
           {paths.map((p) => (
             <path key={'b-' + p.name} d={p.d} fill="#000" />

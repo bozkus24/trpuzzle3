@@ -344,9 +344,11 @@ export default function App() {
       )
     // Tek buton: destekleyen cihazda sistem paylaş menüsünü açar (WhatsApp, X,
     // Instagram, Telegram, kopyala…); desteklenmeyen yerde panoya kopyalar.
+    // Adres ayrı alanda gönderilince uygulamalar metnin sonuna boşlukla
+    // ekliyordu; kendi satırında dursun diye metnin içine konuyor.
     if (navigator.share) {
       navigator
-        .share({ title: 'Şehirle', text, url })
+        .share({ title: 'Şehirle', text: `${text}\n\n${url}` })
         .catch((hata) => {
           if (hata && hata.name === 'AbortError') return // kullanıcı iptal etti
           kopyala()

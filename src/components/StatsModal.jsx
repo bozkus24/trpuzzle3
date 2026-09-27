@@ -1,3 +1,4 @@
+import DailyNext from './DailyNext'
 import { useState } from 'react'
 import { avgGuesses, winPct, DIST_BUCKETS, bucketIndex } from '../lib/stats'
 
@@ -133,6 +134,7 @@ export default function StatsModal({
             </button>
           )}
         </div>
+        {tab === 'daily' && (daily.won || daily.gaveUp) && <DailyNext />}
       </div>
     </div>
   )

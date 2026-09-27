@@ -6,7 +6,7 @@ export default function HowToModal({ onClose, dontShow, onToggleDontShow, showDo
   return (
     <div className="modal-overlay" onMouseDown={onClose}>
       <div
-        className="modal-card"
+        className="modal-card tp-help-box"
         role="dialog"
         aria-modal="true"
         aria-label="Nasıl Oynanır"
@@ -18,6 +18,16 @@ export default function HowToModal({ onClose, dontShow, onToggleDontShow, showDo
 
         <h2 className="modal-title">Nasıl Oynanır</h2>
 
+        <section className="tp-quick">
+          <div className="tp-demo">Uzak → Yakın → Doğru il</div>
+          <ol>
+            <li>Türkiye’den bir il adı yaz.</li>
+            <li>Renk ve sıcak/soğuk ipucuyla hedefe yaklaş.</li>
+            <li>Gizli ili 12 tahminde bul.</li>
+          </ol>
+        </section>
+        <details className="tp-help-details">
+          <summary>Ayrıntılı kurallar ve oyun modları</summary>
         <div className="howto">
           <p>
             <b>Oyunun amacı</b>, Türkiye'nin <b>81 ilinden</b> seçilen gizli bir şehri{' '}
@@ -56,6 +66,8 @@ export default function HowToModal({ onClose, dontShow, onToggleDontShow, showDo
           </p>
         </div>
 
+        </details>
+
         {showDontShow && (
           <label className="dontshow">
             <input type="checkbox" checked={dontShow} onChange={onToggleDontShow} />
@@ -65,7 +77,7 @@ export default function HowToModal({ onClose, dontShow, onToggleDontShow, showDo
 
         <div className="modal-actions">
           <button className="modal-btn wide" onClick={onClose}>
-            Anladım
+            Başla
           </button>
         </div>
       </div>

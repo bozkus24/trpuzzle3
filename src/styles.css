@@ -1315,3 +1315,10 @@ body {
 @media (min-width: 760px) {
   .modal-card:has(.howto) { width: min(600px, 100%); }
 }
+
+/* Oyun alanı mobilde ilk ekranı doldursun; tanıtım daha aşağıda kalsın. */
+@media (max-width:640px) {
+  #root { min-height:100svh; }
+  .map-wrap { margin-top:20px; }
+  .tr-map { min-height:260px; }
+}

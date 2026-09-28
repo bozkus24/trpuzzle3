@@ -74,7 +74,9 @@ body {
   min-height: 56px;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .brand-group {
@@ -103,10 +105,9 @@ body {
 }
 
 .topbar-actions {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  position: static;
+  margin-left: auto;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 2px;
@@ -1321,4 +1322,13 @@ body {
   #root { min-height:100svh; }
   .map-wrap { margin-top:20px; }
   .tr-map { min-height:260px; }
+}
+
+@media (max-width: 420px) {
+  .topbar-inner { padding-inline: 10px; gap: 4px; }
+  .brand-group { gap: 4px; }
+  .topbar .logo { height: 32px; }
+  .topbar .brand { font-size: 1.15rem; letter-spacing: .015em; }
+  .topbar-actions { gap: 0; }
+  .topbar .icon-btn { width: 36px; height: 44px; }
 }

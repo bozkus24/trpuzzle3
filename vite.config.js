@@ -6,7 +6,7 @@ export default defineConfig({
   base: './',
   plugins: [react()],
   build: {
-    // Görselleri (logo vb.) base64 gömerek tek dosya önizlemede de çalışsın
-    assetsInlineLimit: 20 * 1024 * 1024,
+    // Büyük görseller ayrı, içerik hashli dosyalar olarak önbelleğe alınır.
+    assetsInlineLimit: 4096,
   },
 })

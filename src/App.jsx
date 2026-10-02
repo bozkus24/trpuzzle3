@@ -8,11 +8,8 @@ import ModeModal from './components/ModeModal'
 import ResultModal from './components/ResultModal'
 import { findProvince, MAX_BORDER_KM } from './lib/provinces'
 import {
-  dailyProvince,
-  randomProvince,
   todayKey,
   puzzleNo,
-  evaluateGuess,
   proximity,
   heatColor,
   targetColorFor,
@@ -45,8 +42,13 @@ export default function App() {
   const dateKey = useMemo(() => todayKey(), [])
 
   // Hedef il moda göre
-  const [practiceTarget, setPracticeTarget] = useState(() => randomProvince())
-  const target = mode === 'daily' ? dailyProvince(dateKey) : practiceTarget
+  const [target,setTarget]=useState(null)
+  const [evaluations,setEvaluations]=useState([])
+  const [remoteBusy,setRemoteBusy]=useState(true)
+  const [remoteError,setRemoteError]=useState('')
+  const [round,setRound]=useState(0)
+  const remote=useRef(null),remotePending=useRef(false),remoteGeneration=useRef(0)
+  const applyView=(v)=>{setTarget(v.answer?findProvince(v.answer):null);setEvaluations(v.evaluations.map(e=>({...e,province:findProvince(e.name)})));setGuesses(v.guesses.map(findProvince));setWon(v.win);setGaveUp(v.done&&!v.win)}
 
   const [guesses, setGuesses] = useState([]) // il nesneleri (tahmin sırası)
   const [won, setWon] = useState(false)
@@ -160,26 +162,24 @@ export default function App() {
     })
   }
 
-  // Günün ili ilerlemesini yükle
-  useEffect(() => {
-    if (mode !== 'daily') return
-    try {
-      const raw = localStorage.getItem(DAILY_STORE(dateKey))
-      if (raw) {
-        const data = JSON.parse(raw)
-        const gs = (data.guesses || []).map(findProvince).filter(Boolean)
-        setGuesses(gs)
-        setWon(!!data.won)
-        setGaveUp(!!data.gaveUp)
-        if (data.won) setStats(recordDailyWin(dateKey, gs.length))
-        else if (data.gaveUp) setStats(recordDailyLoss(dateKey))
-        return
-      }
-    } catch {}
-    setGuesses([])
-    setWon(false)
-    setGaveUp(false)
-  }, [mode, dateKey])
+  useEffect(()=>{
+    const generation=++remoteGeneration.current;remotePending.current=true;setRemoteBusy(true);setRemoteError('');
+    let saved=null;
+    if(mode==='daily'){try{saved=JSON.parse(localStorage.getItem(DAILY_STORE(dateKey)))}catch{}}
+    const options={date:dateKey,mode};
+    if(mode==='practice'&&round>0&&remote.current?.view.answer)options.exclude=remote.current.view.answer;
+    if(saved?.token)options.token=saved.token;
+    else if(saved?.guesses?.length){options.legacyMoves=[...saved.guesses];if(saved.gaveUp&&saved.guesses.length<MAX_GUESSES)options.legacyMoves.push('giveup')}
+    window.TrPuzzleRemote.open('sehirle',options).then(session=>{
+      if(generation!==remoteGeneration.current)return;
+      remote.current=session;applyView(session.view);
+      try {
+      if(mode==='daily')localStorage.setItem(DAILY_STORE(dateKey),JSON.stringify({guesses:session.view.guesses,won:session.view.win,gaveUp:session.view.done&&!session.view.win,token:session.token,answer:session.view.answer||null}));
+      } catch {}
+    }).catch(e=>{if(generation===remoteGeneration.current)setRemoteError(e.message)})
+      .finally(()=>{if(generation===remoteGeneration.current){remotePending.current=false;setRemoteBusy(false)}});
+    return ()=>{remoteGeneration.current++};
+  },[mode,dateKey,round])
 
   // Günün ili ilerlemesini kaydet
   const persistDaily = useCallback(
@@ -187,7 +187,7 @@ export default function App() {
       try {
         localStorage.setItem(
           DAILY_STORE(dateKey),
-          JSON.stringify({ guesses: gs.map((p) => p.name), won: w, gaveUp: g })
+          JSON.stringify({ guesses: gs.map((p) => p.name), won: w, gaveUp: g,token:remote.current?.token,answer:remote.current?.view.answer||null })
         )
       } catch {}
     },
@@ -197,13 +197,20 @@ export default function App() {
   const finished = won || gaveUp
 
   const handleGuess = useCallback(
-    (province) => {
-      if (finished) return
+    async (province) => {
+      if (finished||remotePending.current||!remote.current) return false
       if (guesses.some((g) => g.name === province.name)) return
-      const next = [...guesses, province]
+      const generation=remoteGeneration.current;remotePending.current=true;setRemoteBusy(true);setRemoteError('');
+      let view;
+      try{view=await window.TrPuzzleRemote.move(remote.current,province.name)}
+      catch(e){if(generation===remoteGeneration.current)setRemoteError(e.message);return false}
+      finally{if(generation===remoteGeneration.current){remotePending.current=false;setRemoteBusy(false)}}
+      if(generation!==remoteGeneration.current)return false;
+      applyView(view);
+      const next = view.guesses.map(findProvince)
       setGuesses(next)
       startBlink(province.name)
-      const isWin = province.name === target.name
+      const isWin = view.win
       // 12 tahminde bilinemezse şehir gösterilir (oyun biter)
       const outOfGuesses = !isWin && next.length >= MAX_GUESSES
       if (isWin) {
@@ -229,13 +236,9 @@ export default function App() {
       } else if (mode === 'daily') {
         persistDaily(next, false, false)
       }
+      return true
     },
-    [finished, guesses, target, mode, persistDaily, dateKey, startBlink]
-  )
-
-  const evaluations = useMemo(
-    () => guesses.map((g) => evaluateGuess(g, target)),
-    [guesses, target]
+    [finished, guesses, mode, persistDaily, dateKey, startBlink]
   )
 
   // En yakın sınır mesafesine göre yakınlık ve renk
@@ -268,7 +271,7 @@ export default function App() {
   const closest = byDist.length ? byDist[0] : null
 
   // Günün ili sonucu (mod ne olursa olsun localStorage'dan)
-  const dailyAnswer = useMemo(() => dailyProvince(dateKey).name, [dateKey])
+  let dailyAnswer='';try{dailyAnswer=JSON.parse(localStorage.getItem(DAILY_STORE(dateKey)))?.answer||''}catch{}
   const daily = useMemo(() => {
     try {
       const raw = localStorage.getItem(DAILY_STORE(dateKey))
@@ -285,7 +288,7 @@ export default function App() {
   }, [dateKey, guesses, won, gaveUp, showStats])
 
   function newPractice() {
-    setPracticeTarget(randomProvince(practiceTarget))
+    setRound(r=>r+1)
     setGuesses([])
     setWon(false)
     setGaveUp(false)
@@ -293,7 +296,12 @@ export default function App() {
     setShowResult(false)
   }
 
-  function giveUp() {
+  async function giveUp() {
+    if(remotePending.current||!remote.current||finished)return;
+    const generation=remoteGeneration.current;remotePending.current=true;setRemoteBusy(true);
+    try{const v=await window.TrPuzzleRemote.move(remote.current,'giveup');if(generation!==remoteGeneration.current)return;applyView(v)}
+    catch(e){if(generation===remoteGeneration.current)setRemoteError(e.message);return}
+    finally{if(generation===remoteGeneration.current){remotePending.current=false;setRemoteBusy(false)}}
     setGaveUp(true)
     if (mode === 'daily') {
       persistDaily(guesses, false, true)
@@ -313,7 +321,7 @@ export default function App() {
       setGuesses([])
       setWon(false)
       setGaveUp(false)
-      setPracticeTarget(randomProvince())
+
     }
   }
 
@@ -348,7 +356,7 @@ export default function App() {
     // ekliyordu; kendi satırında dursun diye metnin içine konuyor.
     if (navigator.share) {
       navigator
-        .share({ title: 'Şehirle', text: `${text}\n\n${url}` })
+        .share({ text: `${text}\n\n${url}` })
         .catch((hata) => {
           if (hata && hata.name === 'AbortError') return // kullanıcı iptal etti
           kopyala()
@@ -491,13 +499,14 @@ export default function App() {
       {/* Tahmin kutusu haritanın ÜSTÜNDE; geri bildirim butonun altında */}
       {!finished ? (
         <>
-          <GuessInput onGuess={handleGuess} disabled={finished} guessedNames={guessedNames} />
-          <div className={'feedback ' + feedback.tone}>{feedback.text}</div>
+          <GuessInput onGuess={handleGuess} disabled={finished||remoteBusy||!remote.current} guessedNames={guessedNames} />
+          <div className={'feedback ' + feedback.tone}>{remoteBusy?'Oyun kontrol ediliyor…':feedback.text}</div>
+          {remoteError&&<div role="alert">{remoteError}<button onClick={()=>setRound(r=>r+1)}>Yeniden bağlan</button></div>}
         </>
       ) : (
         !showStats && (
           <div className="reveal-banner" style={{ color: targetColorFor(colorBlind) }}>
-            Gizemli Şehir {target.name}!
+            Gizemli Şehir {target?.name||''}!
           </div>
         )
       )}
@@ -558,7 +567,7 @@ export default function App() {
       {showResult && mode === 'practice' && (
         <ResultModal
           won={won}
-          answer={target.name}
+          answer={target?.name||''}
           count={guesses.length}
           onNewGame={newPractice}
           onClose={() => setShowResult(false)}

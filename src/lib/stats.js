@@ -33,6 +33,9 @@ function loadFrom(key) {
   try {
     const raw = JSON.parse(localStorage.getItem(key)) || {}
     const s = { ...defaults(), ...raw }
+    const count = n => Number.isSafeInteger(n) && n >= 0 ? n : 0
+    Object.entries(defaults()).forEach(([k,v]) => { if(typeof v === 'number') s[k]=count(s[k]) })
+    if(Array.isArray(s.dist)) s.dist=s.dist.map(count)
     // Eski kayıtlarda dist eksik/farklı uzunluktaysa sıfırla
     if (!Array.isArray(s.dist) || s.dist.length !== DIST_BUCKETS.length) {
       s.dist = DIST_BUCKETS.map(() => 0)

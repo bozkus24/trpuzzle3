@@ -5,7 +5,8 @@ export default function GuessInput({ onGuess, disabled, guessedNames }) {
   const [value, setValue] = useState('')
   const [error, setError] = useState('')
 
-  function submit() {
+  async function submit() {
+    if(disabled)return;
     const p = findProvince(value)
     if (!p) {
       setError('Böyle bir şehir bulunamadı')
@@ -15,7 +16,7 @@ export default function GuessInput({ onGuess, disabled, guessedNames }) {
       setError(`${p.name} zaten tahmin edildi`)
       return
     }
-    onGuess(p)
+    if(await onGuess(p)===false)return
     setValue('')
     setError('')
   }

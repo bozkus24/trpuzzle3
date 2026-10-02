@@ -6,7 +6,7 @@
   "description": "Globle'ın Türkiye illeri versiyonu — günün ilini tahmin et",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && python3 tools/build_publish.py --headers-only",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -15,8 +15,8 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@fontsource-variable/nunito": "^5.3.0",
     "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^5.4.11",
-    "@fontsource-variable/nunito": "^5.3.0"
+    "vite": "^6.4.3"
   }
 }

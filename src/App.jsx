@@ -333,6 +333,7 @@ export default function App() {
 
   const [copied, setCopied] = useState(false)
   function share() {
+    if (!daily.finished) return
     // Her zaman GÜNÜN sonucunu paylaş
     const head = `Şehirle #${puzzleNo(dateKey)}`
     let result

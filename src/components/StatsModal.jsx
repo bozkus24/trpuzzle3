@@ -122,8 +122,8 @@ export default function StatsModal({
           ))}
         </div>
 
-        <div className="modal-actions">
-          {tab === 'daily' && (
+        {((tab === 'daily' && daily.finished) || finished) && <div className="modal-actions">
+          {tab === 'daily' && daily.finished && (
             <button className="modal-btn" onClick={onShare}>
               {shareLabel}
             </button>
@@ -133,8 +133,8 @@ export default function StatsModal({
               {mode === 'daily' ? 'Pratik' : 'Yeni oyun'}
             </button>
           )}
-        </div>
-        {tab === 'daily' && (daily.won || daily.gaveUp) && <DailyNext />}
+        </div>}
+        {tab === 'daily' && daily.finished && <DailyNext />}
       </div>
     </div>
   )

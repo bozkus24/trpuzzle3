@@ -17,7 +17,7 @@ export function todayKey(date = new Date()) {
 }
 
 /** Bulmaca numarasi - site genelinde ayni: 1 Agustos 2026 = #1. */
-const EPOCH = new Date(2026, 7, 1)
+const EPOCH = new Date(2026, 9, 1)
 export function puzzleNo(key = todayKey()) {
   const [y, m, d] = key.split('-').map(Number)
   return Math.round((new Date(y, m - 1, d) - EPOCH) / 86400000) + 1
